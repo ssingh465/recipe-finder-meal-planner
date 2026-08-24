@@ -1,0 +1,50 @@
+name: App CI
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'app/**'
+      - '.github/workflows/app-ci.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - '.github/workflows/app-ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run check
+
+      - run: npm run test -- --run
+
+      - name: npm audit (non-blocking)
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      # Verification gate: the app must build with the library source deleted,
+      # proving it consumes the published package and not a relative import
+      # or workspace link.
+      - name: Isolation build
+        working-directory: ${{ github.workspace }}
+        run: |
+          rm -rf library
+          cd app
+          npm ci
+          npm run build
