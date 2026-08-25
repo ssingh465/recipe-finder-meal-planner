@@ -1,6 +1,16 @@
-// This page only renders Stencil custom elements with locally-owned mock
-// data — there's nothing for the server to fetch or render. SSR would place
-// them in the initial HTML, where the browser upgrades them the instant
-// hooks.client.ts registers the tags, racing Svelte's own property
-// assignment on the same elements.
-export const ssr = false;
+// SSR via `load` — server-rendered first paint, no client waterfall. Using
+// SvelteKit's own `fetch` also means a superseded navigation (the user changes the
+// search/filter state again before this resolves) aborts the in-flight request for free.
+import { parseDiscoveryQuery } from '$lib/domain/discoveryQuery';
+import { resolveDiscoveryCandidates } from '$lib/services/discovery';
+import type { PageLoad } from './$types';
+
+export const load: PageLoad = async ({ url, fetch }) => {
+	const query = parseDiscoveryQuery(url);
+	const result = await resolveDiscoveryCandidates(
+		{ q: query.q, category: query.category, area: query.area },
+		undefined,
+		fetch
+	);
+	return { query, result };
+};
