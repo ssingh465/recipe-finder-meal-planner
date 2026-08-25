@@ -17,7 +17,13 @@
 	$effect(() => {
 		if (open) {
 			triggerElement = document.activeElement;
-			dialog?.focus();
+			// The first focusable control (typically the safe action, e.g. Cancel)
+			// rather than the dialog shell itself, so opening the modal puts focus
+			// somewhere a keyboard user can immediately act on.
+			const focusable = dialog?.querySelector<HTMLElement>(
+				'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+			);
+			(focusable ?? dialog)?.focus();
 		} else if (triggerElement instanceof HTMLElement) {
 			triggerElement.focus();
 		}

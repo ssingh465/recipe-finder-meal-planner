@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	interface Props {
 		backHref: string;
@@ -15,13 +16,32 @@
 
 	let { backHref, backLabel, title, meta, media, actions, ingredients, instructions, sourceLinks }: Props =
 		$props();
+
+	// Uses browser history so "Back" returns to wherever the user actually came
+	// from (a filtered discovery view, favorites, the planner); falls back to
+	// backHref when there is no history entry to return to, e.g. a direct visit.
+	function handleBackClick(event: MouseEvent): void {
+		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+			return;
+		}
+		event.preventDefault();
+		// A click handler only ever runs in the browser, so `window` is safe here.
+		// eslint-disable-next-line no-restricted-globals
+		if (window.history.length > 1) {
+			// eslint-disable-next-line no-restricted-globals
+			window.history.back();
+		} else {
+			goto(backHref);
+		}
+	}
 </script>
 
 <div class="page">
-	<a href={backHref} class="back">
+	<a href={backHref} class="back" onclick={handleBackClick}>
 		<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+			<path d="M19 12H5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
 			<path
-				d="M15 6l-6 6 6 6"
+				d="m12 19-7-7 7-7"
 				stroke="currentColor"
 				stroke-width="1.75"
 				stroke-linecap="round"
