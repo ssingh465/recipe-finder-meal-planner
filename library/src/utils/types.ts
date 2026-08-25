@@ -3,9 +3,10 @@
  *
  * `DayOfWeek` and `RecipeSummary` mirror the app's own domain types
  * (app/src/lib/domain) structurally. The library cannot import them from the
- * app — the dependency runs library -> app only (TRD §6.1) — so it declares
- * its own copies here; TypeScript's structural typing makes the app's
- * interfaces assignable to these without either package importing the other.
+ * app — it must build and publish independently, and the dependency only
+ * ever runs library -> app — so it declares its own copies here;
+ * TypeScript's structural typing makes the app's interfaces assignable to
+ * these without either package importing the other.
  *
  * `DayOption` and `PlannerEntry` have no equivalent elsewhere: they are
  * genuinely owned by the library and re-exported for the app to import.

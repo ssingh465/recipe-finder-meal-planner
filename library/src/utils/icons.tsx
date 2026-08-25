@@ -1,9 +1,9 @@
 import { h } from '@stencil/core';
 
 // Lucide icons (ISC), inlined as local JSX so they render inside a shadow
-// root — an external sprite sheet would not resolve there (DESIGN §7.12).
-// 20px default, stroke-width 1.75, currentColor, aria-hidden: the accessible
-// name lives on the control, not the glyph.
+// root — an external sprite sheet would not resolve there. 20px default,
+// stroke-width 1.75, currentColor, aria-hidden: the accessible name lives
+// on the control, not the glyph.
 
 const base = {
   viewBox: '0 0 24 24',

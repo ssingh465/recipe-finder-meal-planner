@@ -8,8 +8,8 @@
 ## Overview
 
 Loading placeholder that matches `recipe-card`'s geometry exactly, so the
-TRD §6.4b space reservation holds and the grid does not shift when real
-cards arrive (D-25).
+reserved space for an undefined custom element holds and the grid does
+not shift when real cards arrive.
 
 ## Properties
 

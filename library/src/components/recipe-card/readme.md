@@ -7,9 +7,9 @@
 
 ## Overview
 
-The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
-22rem height regardless of content — recipe-card:not(:defined) must
-reserve the same value (TRD §6.4b).
+The app's primary discovery/favorites/planner unit. Fixed 22rem height
+regardless of content — recipe-card:not(:defined) must reserve the same
+value so an unregistered element doesn't cause a layout jump.
 
 ## Properties
 

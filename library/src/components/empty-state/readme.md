@@ -7,8 +7,8 @@
 
 ## Overview
 
-A generic shell for empty results (TRD §7.1) — the app slots in the
-wording and, optionally, a call-to-action button.
+A generic shell for empty results — the app slots in the wording and,
+optionally, a call-to-action button.
 
 ## Properties
 

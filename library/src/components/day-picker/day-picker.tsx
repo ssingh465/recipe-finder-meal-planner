@@ -3,9 +3,8 @@ import type { DayOfWeek, DayOption } from '../../utils/types';
 import { CalendarPlusIcon, CheckIcon } from '../../utils/icons';
 
 /**
- * The most-used component in the system (DESIGN §7.10) — assigns a recipe
- * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
- * never inferred from a store.
+ * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
+ * (`DayOption.occupied`), never inferred from a store.
  *
  * The panel uses the native Popover API (`popover="manual"`) so it renders
  * in the browser's top layer — the one mechanism that reliably escapes a

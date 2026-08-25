@@ -8,11 +8,11 @@
 ## Overview
 
 One day's column/section in the planner. Owns its complete accessible
-name from its own props (D-22, D-32) — `dayLabel` becomes the region's
-name because ARIA relationships cannot cross the shadow boundary.
+name from its own props — `dayLabel` becomes the region's name because
+ARIA relationships cannot cross the shadow boundary.
 
 Deliberately has no `today` prop: the planner is a dateless recurring
-week (OQ-3), so there is nothing to derive "today" from.
+week, so there is nothing to derive "today" from.
 
 ## Properties
 

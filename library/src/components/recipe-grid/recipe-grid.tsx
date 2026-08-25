@@ -1,9 +1,9 @@
 import { Component, Prop, Host, h } from '@stencil/core';
 
 /**
- * A responsive card grid with an explicit column count (DESIGN §6.3) —
- * never `auto-fill`, so the app decides the breakpoint behaviour instead of
- * the browser guessing it.
+ * A responsive card grid with an explicit column count — never `auto-fill`,
+ * so the app decides the breakpoint behaviour instead of the browser
+ * guessing it.
  */
 @Component({
   tag: 'recipe-grid',

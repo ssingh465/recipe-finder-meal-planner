@@ -1,6 +1,6 @@
-// Deterministic hue for the image-less recipe tile (DESIGN.md §7.4). Six
-// curated hues keep every result on-palette; the sum-of-char-codes hash
-// means a given recipe name always lands on the same hue.
+// Deterministic hue for the image-less recipe tile. Six curated hues keep
+// every result on-palette; the sum-of-char-codes hash means a given recipe
+// name always lands on the same hue.
 const HUES = [18, 34, 96, 168, 262, 344] as const;
 
 export function tileHue(name: string): number {

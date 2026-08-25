@@ -2,9 +2,9 @@ import { Component, Prop, Event, EventEmitter, Host, h } from '@stencil/core';
 import { XIcon } from '../../utils/icons';
 
 /**
- * A chip only exists while its filter is active (TRD §7.1), so it has no
- * `active` prop and no separate `chipclear` event — removing it and
- * clearing its dimension are the same action.
+ * A chip only exists while its filter is active, so it has no `active` prop
+ * and no separate clear event — removing it and clearing its dimension are
+ * the same action.
  */
 @Component({
   tag: 'filter-chip',

@@ -11,9 +11,8 @@ export { DayOfWeek, DayOption, PlannerEntry, RecipeSummary } from "./utils/types
 export { SpikeNote } from "./components/spike-panel/spike-panel";
 export namespace Components {
     /**
-     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
-     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
-     * never inferred from a store.
+     * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
+     * (`DayOption.occupied`), never inferred from a store.
      * The panel uses the native Popover API (`popover="manual"`) so it renders
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
@@ -25,16 +24,16 @@ export namespace Components {
         "recipeId": string;
     }
     /**
-     * A generic shell for empty results (TRD §7.1) — the app slots in the
-     * wording and, optionally, a call-to-action button.
+     * A generic shell for empty results — the app slots in the wording and,
+     * optionally, a call-to-action button.
      */
     interface EmptyState {
         "heading": string;
     }
     /**
-     * A chip only exists while its filter is active (TRD §7.1), so it has no
-     * `active` prop and no separate `chipclear` event — removing it and
-     * clearing its dimension are the same action.
+     * A chip only exists while its filter is active, so it has no `active` prop
+     * and no separate clear event — removing it and clearing its dimension are
+     * the same action.
      */
     interface FilterChip {
         "dimension": 'category' | 'area';
@@ -43,10 +42,10 @@ export namespace Components {
     }
     /**
      * One day's column/section in the planner. Owns its complete accessible
-     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
-     * name because ARIA relationships cannot cross the shadow boundary.
+     * name from its own props — `dayLabel` becomes the region's name because
+     * ARIA relationships cannot cross the shadow boundary.
      * Deliberately has no `today` prop: the planner is a dateless recurring
-     * week (OQ-3), so there is nothing to derive "today" from.
+     * week, so there is nothing to derive "today" from.
      */
     interface PlannerDay {
         /**
@@ -61,9 +60,9 @@ export namespace Components {
         "entries": PlannerEntry[];
     }
     /**
-     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
-     * 22rem height regardless of content — recipe-card:not(:defined) must
-     * reserve the same value (TRD §6.4b).
+     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
+     * regardless of content — recipe-card:not(:defined) must reserve the same
+     * value so an unregistered element doesn't cause a layout jump.
      */
     interface RecipeCard {
         /**
@@ -74,9 +73,9 @@ export namespace Components {
         "recipe": RecipeSummary;
     }
     /**
-     * A responsive card grid with an explicit column count (DESIGN §6.3) —
-     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
-     * the browser guessing it.
+     * A responsive card grid with an explicit column count — never `auto-fill`,
+     * so the app decides the breakpoint behaviour instead of the browser
+     * guessing it.
      */
     interface RecipeGrid {
         /**
@@ -86,8 +85,8 @@ export namespace Components {
     }
     /**
      * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
-     * TRD §6.4b space reservation holds and the grid does not shift when real
-     * cards arrive (D-25).
+     * reserved space for an undefined custom element holds and the grid does
+     * not shift when real cards arrive.
      */
     interface SkeletonCard {
         /**
@@ -133,9 +132,8 @@ declare global {
         "pickerclose": Record<string, never>;
     }
     /**
-     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
-     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
-     * never inferred from a store.
+     * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
+     * (`DayOption.occupied`), never inferred from a store.
      * The panel uses the native Popover API (`popover="manual"`) so it renders
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
@@ -156,8 +154,8 @@ declare global {
         new (): HTMLDayPickerElement;
     };
     /**
-     * A generic shell for empty results (TRD §7.1) — the app slots in the
-     * wording and, optionally, a call-to-action button.
+     * A generic shell for empty results — the app slots in the wording and,
+     * optionally, a call-to-action button.
      */
     interface HTMLEmptyStateElement extends Components.EmptyState, HTMLStencilElement {
     }
@@ -169,9 +167,9 @@ declare global {
         "chiptoggle": { dimension: 'category' | 'area'; value: string };
     }
     /**
-     * A chip only exists while its filter is active (TRD §7.1), so it has no
-     * `active` prop and no separate `chipclear` event — removing it and
-     * clearing its dimension are the same action.
+     * A chip only exists while its filter is active, so it has no `active` prop
+     * and no separate clear event — removing it and clearing its dimension are
+     * the same action.
      */
     interface HTMLFilterChipElement extends Components.FilterChip, HTMLStencilElement {
         addEventListener<K extends keyof HTMLFilterChipElementEventMap>(type: K, listener: (this: HTMLFilterChipElement, ev: FilterChipCustomEvent<HTMLFilterChipElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -194,10 +192,10 @@ declare global {
     }
     /**
      * One day's column/section in the planner. Owns its complete accessible
-     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
-     * name because ARIA relationships cannot cross the shadow boundary.
+     * name from its own props — `dayLabel` becomes the region's name because
+     * ARIA relationships cannot cross the shadow boundary.
      * Deliberately has no `today` prop: the planner is a dateless recurring
-     * week (OQ-3), so there is nothing to derive "today" from.
+     * week, so there is nothing to derive "today" from.
      */
     interface HTMLPlannerDayElement extends Components.PlannerDay, HTMLStencilElement {
         addEventListener<K extends keyof HTMLPlannerDayElementEventMap>(type: K, listener: (this: HTMLPlannerDayElement, ev: PlannerDayCustomEvent<HTMLPlannerDayElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -218,9 +216,9 @@ declare global {
         "recipeselect": { recipeId: string };
     }
     /**
-     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
-     * 22rem height regardless of content — recipe-card:not(:defined) must
-     * reserve the same value (TRD §6.4b).
+     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
+     * regardless of content — recipe-card:not(:defined) must reserve the same
+     * value so an unregistered element doesn't cause a layout jump.
      */
     interface HTMLRecipeCardElement extends Components.RecipeCard, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRecipeCardElementEventMap>(type: K, listener: (this: HTMLRecipeCardElement, ev: RecipeCardCustomEvent<HTMLRecipeCardElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -237,9 +235,9 @@ declare global {
         new (): HTMLRecipeCardElement;
     };
     /**
-     * A responsive card grid with an explicit column count (DESIGN §6.3) —
-     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
-     * the browser guessing it.
+     * A responsive card grid with an explicit column count — never `auto-fill`,
+     * so the app decides the breakpoint behaviour instead of the browser
+     * guessing it.
      */
     interface HTMLRecipeGridElement extends Components.RecipeGrid, HTMLStencilElement {
     }
@@ -249,8 +247,8 @@ declare global {
     };
     /**
      * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
-     * TRD §6.4b space reservation holds and the grid does not shift when real
-     * cards arrive (D-25).
+     * reserved space for an undefined custom element holds and the grid does
+     * not shift when real cards arrive.
      */
     interface HTMLSkeletonCardElement extends Components.SkeletonCard, HTMLStencilElement {
     }
@@ -295,9 +293,8 @@ declare namespace LocalJSX {
     type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
 
     /**
-     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
-     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
-     * never inferred from a store.
+     * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
+     * (`DayOption.occupied`), never inferred from a store.
      * The panel uses the native Popover API (`popover="manual"`) so it renders
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
@@ -311,16 +308,16 @@ declare namespace LocalJSX {
         "recipeId": string;
     }
     /**
-     * A generic shell for empty results (TRD §7.1) — the app slots in the
-     * wording and, optionally, a call-to-action button.
+     * A generic shell for empty results — the app slots in the wording and,
+     * optionally, a call-to-action button.
      */
     interface EmptyState {
         "heading": string;
     }
     /**
-     * A chip only exists while its filter is active (TRD §7.1), so it has no
-     * `active` prop and no separate `chipclear` event — removing it and
-     * clearing its dimension are the same action.
+     * A chip only exists while its filter is active, so it has no `active` prop
+     * and no separate clear event — removing it and clearing its dimension are
+     * the same action.
      */
     interface FilterChip {
         "dimension": 'category' | 'area';
@@ -330,10 +327,10 @@ declare namespace LocalJSX {
     }
     /**
      * One day's column/section in the planner. Owns its complete accessible
-     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
-     * name because ARIA relationships cannot cross the shadow boundary.
+     * name from its own props — `dayLabel` becomes the region's name because
+     * ARIA relationships cannot cross the shadow boundary.
      * Deliberately has no `today` prop: the planner is a dateless recurring
-     * week (OQ-3), so there is nothing to derive "today" from.
+     * week, so there is nothing to derive "today" from.
      */
     interface PlannerDay {
         /**
@@ -351,9 +348,9 @@ declare namespace LocalJSX {
         "onEntryremove"?: (event: PlannerDayCustomEvent<{ recipeId: string; day: DayOfWeek }>) => void;
     }
     /**
-     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
-     * 22rem height regardless of content — recipe-card:not(:defined) must
-     * reserve the same value (TRD §6.4b).
+     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
+     * regardless of content — recipe-card:not(:defined) must reserve the same
+     * value so an unregistered element doesn't cause a layout jump.
      */
     interface RecipeCard {
         /**
@@ -366,9 +363,9 @@ declare namespace LocalJSX {
         "recipe": RecipeSummary;
     }
     /**
-     * A responsive card grid with an explicit column count (DESIGN §6.3) —
-     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
-     * the browser guessing it.
+     * A responsive card grid with an explicit column count — never `auto-fill`,
+     * so the app decides the breakpoint behaviour instead of the browser
+     * guessing it.
      */
     interface RecipeGrid {
         /**
@@ -378,8 +375,8 @@ declare namespace LocalJSX {
     }
     /**
      * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
-     * TRD §6.4b space reservation holds and the grid does not shift when real
-     * cards arrive (D-25).
+     * reserved space for an undefined custom element holds and the grid does
+     * not shift when real cards arrive.
      */
     interface SkeletonCard {
         /**
@@ -447,9 +444,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             /**
-             * The most-used component in the system (DESIGN §7.10) — assigns a recipe
-             * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
-             * never inferred from a store.
+             * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
+             * (`DayOption.occupied`), never inferred from a store.
              * The panel uses the native Popover API (`popover="manual"`) so it renders
              * in the browser's top layer — the one mechanism that reliably escapes a
              * card's `overflow: hidden` and any transformed ancestor's containing
@@ -457,40 +453,40 @@ declare module "@stencil/core" {
              */
             "day-picker": LocalJSX.IntrinsicElements["day-picker"] & JSXBase.HTMLAttributes<HTMLDayPickerElement>;
             /**
-             * A generic shell for empty results (TRD §7.1) — the app slots in the
-             * wording and, optionally, a call-to-action button.
+             * A generic shell for empty results — the app slots in the wording and,
+             * optionally, a call-to-action button.
              */
             "empty-state": LocalJSX.IntrinsicElements["empty-state"] & JSXBase.HTMLAttributes<HTMLEmptyStateElement>;
             /**
-             * A chip only exists while its filter is active (TRD §7.1), so it has no
-             * `active` prop and no separate `chipclear` event — removing it and
-             * clearing its dimension are the same action.
+             * A chip only exists while its filter is active, so it has no `active` prop
+             * and no separate clear event — removing it and clearing its dimension are
+             * the same action.
              */
             "filter-chip": LocalJSX.IntrinsicElements["filter-chip"] & JSXBase.HTMLAttributes<HTMLFilterChipElement>;
             /**
              * One day's column/section in the planner. Owns its complete accessible
-             * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
-             * name because ARIA relationships cannot cross the shadow boundary.
+             * name from its own props — `dayLabel` becomes the region's name because
+             * ARIA relationships cannot cross the shadow boundary.
              * Deliberately has no `today` prop: the planner is a dateless recurring
-             * week (OQ-3), so there is nothing to derive "today" from.
+             * week, so there is nothing to derive "today" from.
              */
             "planner-day": LocalJSX.IntrinsicElements["planner-day"] & JSXBase.HTMLAttributes<HTMLPlannerDayElement>;
             /**
-             * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
-             * 22rem height regardless of content — recipe-card:not(:defined) must
-             * reserve the same value (TRD §6.4b).
+             * The app's primary discovery/favorites/planner unit. Fixed 22rem height
+             * regardless of content — recipe-card:not(:defined) must reserve the same
+             * value so an unregistered element doesn't cause a layout jump.
              */
             "recipe-card": LocalJSX.IntrinsicElements["recipe-card"] & JSXBase.HTMLAttributes<HTMLRecipeCardElement>;
             /**
-             * A responsive card grid with an explicit column count (DESIGN §6.3) —
-             * never `auto-fill`, so the app decides the breakpoint behaviour instead of
-             * the browser guessing it.
+             * A responsive card grid with an explicit column count — never `auto-fill`,
+             * so the app decides the breakpoint behaviour instead of the browser
+             * guessing it.
              */
             "recipe-grid": LocalJSX.IntrinsicElements["recipe-grid"] & JSXBase.HTMLAttributes<HTMLRecipeGridElement>;
             /**
              * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
-             * TRD §6.4b space reservation holds and the grid does not shift when real
-             * cards arrive (D-25).
+             * reserved space for an undefined custom element holds and the grid does
+             * not shift when real cards arrive.
              */
             "skeleton-card": LocalJSX.IntrinsicElements["skeleton-card"] & JSXBase.HTMLAttributes<HTMLSkeletonCardElement>;
             /**
