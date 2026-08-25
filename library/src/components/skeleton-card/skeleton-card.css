@@ -1,0 +1,78 @@
+/* display: contents un-boxes the host so each placeholder becomes a direct
+   grid item of whatever grid <skeleton-card> was dropped into (typically
+   recipe-grid) — one <skeleton-card count="8"> fills the same layout eight
+   recipe-cards would. */
+:host {
+  display: contents;
+}
+
+.skeleton {
+  height: 22rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--rc-surface, #fff);
+  border: 1px solid var(--rc-border, #e7dfd3);
+  border-radius: var(--rc-radius, 14px);
+  overflow: hidden;
+}
+
+.media {
+  height: 12rem;
+  flex: none;
+  background: var(--rc-surface-sunken, #f6f1e9);
+  position: relative;
+  overflow: hidden;
+}
+
+.body {
+  flex: 1;
+  padding: var(--rc-s-4, 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rc-s-2, 0.5rem);
+}
+
+.line {
+  border-radius: var(--rc-radius-sm, 6px);
+  background: var(--rc-surface-sunken, #f6f1e9);
+  position: relative;
+  overflow: hidden;
+}
+
+.line.title {
+  height: 1.25rem;
+  width: 70%;
+}
+
+.line.meta {
+  height: 0.875rem;
+  width: 45%;
+}
+
+.media::after,
+.line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--rc-border, #e7dfd3) 50%, transparent);
+  opacity: 0.3;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media::after,
+  .line::after {
+    animation: none;
+    transform: none;
+    opacity: 0.2;
+  }
+}

@@ -1,0 +1,40 @@
+:host {
+  display: inline-flex;
+  font-family: var(--rc-font-text, system-ui, sans-serif);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rc-s-1, 0.25rem);
+  padding-inline-start: var(--rc-s-3, 0.75rem);
+  border-radius: var(--rc-radius-full, 999px);
+  background: var(--rc-accent-subtle, #fbede4);
+  border: 1px solid var(--rc-accent-border, #efcdb6);
+  color: var(--rc-accent, #bc4e1c);
+  font-size: var(--rc-fs-sm, 0.875rem);
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-inline-start: calc(-1 * var(--rc-s-2, 0.5rem));
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.remove:focus-visible {
+  outline: none;
+  box-shadow: var(--rc-focus-ring, 0 0 0 2px #fff, 0 0 0 4px #2a2420);
+  border-radius: var(--rc-radius-full, 999px);
+}
