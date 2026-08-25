@@ -88,8 +88,16 @@ export function filterByArea(
 	return filterBy('a', area, signal, fetchImpl);
 }
 
-export async function lookup(id: string, signal?: AbortSignal): Promise<Result<Recipe>> {
-	const result = await fetchJson<RawMealsResponse>(`${BASE_URL}/lookup.php?i=${encodeURIComponent(id)}`, signal);
+export async function lookup(
+	id: string,
+	signal?: AbortSignal,
+	fetchImpl?: typeof fetch
+): Promise<Result<Recipe>> {
+	const result = await fetchJson<RawMealsResponse>(
+		`${BASE_URL}/lookup.php?i=${encodeURIComponent(id)}`,
+		signal,
+		fetchImpl
+	);
 	if (!result.ok) return result;
 	const meal = result.data.meals?.[0];
 	if (!meal) return { ok: false, kind: 'notfound', message: `No recipe found for id ${id}.` };
