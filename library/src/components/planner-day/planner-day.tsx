@@ -61,7 +61,11 @@ export class PlannerDay {
   }
 
   render() {
-    const { entries, collapsed, dayLabel } = this;
+    const { collapsed, dayLabel } = this;
+    // Svelte assigns array properties on custom elements only after they've
+    // upgraded; a render in the narrow window before that must see an empty
+    // list, never throw on a stringified attribute.
+    const entries = Array.isArray(this.entries) ? this.entries : [];
     return (
       <Host>
         <section part="region" class="region" role="region" aria-label={dayLabel}>

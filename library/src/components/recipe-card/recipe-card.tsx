@@ -51,6 +51,12 @@ export class RecipeCard {
 
   render() {
     const { recipe, favorited, href } = this;
+    // Svelte assigns object properties on custom elements only after they've
+    // upgraded; a render in the narrow window before that (or a consumer
+    // that hasn't set the prop yet) must degrade to nothing, never throw.
+    if (!recipe || typeof recipe !== 'object') {
+      return <Host></Host>;
+    }
     return (
       <Host>
         <article part="card" class="card">

@@ -58,6 +58,17 @@ describe('planner-day', () => {
     expect(root.querySelector('[slot="empty"]')?.textContent).toBe('Nothing planned');
   });
 
+  it('renders as empty rather than throwing when entries has not arrived as an array yet', async () => {
+    // Regression: a custom element upgraded from server-rendered HTML sees
+    // the attribute form of an array prop (its string coercion) before
+    // Svelte assigns the real property.
+    const { root } = await render(
+      <planner-day day="mon" dayLabel="Monday" entries={'[object Object]' as unknown as never}></planner-day>,
+    );
+    expect(root.shadowRoot?.querySelector('.entries')).toBeNull();
+    expect(root.shadowRoot?.querySelector('.count')?.textContent).toBe('0');
+  });
+
   it('hides entries while collapsed but keeps the header', async () => {
     const { root } = await render(
       <planner-day day="sat" dayLabel="Saturday" entries={entries} collapsed={true}></planner-day>,
