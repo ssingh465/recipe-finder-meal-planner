@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-block: var(--rc-s-6, 2rem);
+  gap: var(--rc-s-3, 0.75rem);
+  font-family: var(--rc-font-text, system-ui, sans-serif);
+  color: var(--rc-text, #2a2420);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--rc-font-display, Georgia, serif);
+  font-size: var(--rc-fs-h3, 1.25rem);
+}
+
+.body {
+  max-width: 44ch;
+  color: var(--rc-text-muted, #6b5f55);
+}

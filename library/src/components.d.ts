@@ -5,9 +5,96 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { DayOfWeek, DayOption, PlannerEntry, RecipeSummary } from "./utils/types";
 import { SpikeNote } from "./components/spike-panel/spike-panel";
+export { DayOfWeek, DayOption, PlannerEntry, RecipeSummary } from "./utils/types";
 export { SpikeNote } from "./components/spike-panel/spike-panel";
 export namespace Components {
+    /**
+     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
+     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
+     * never inferred from a store.
+     * The panel uses the native Popover API (`popover="manual"`) so it renders
+     * in the browser's top layer — the one mechanism that reliably escapes a
+     * card's `overflow: hidden` and any transformed ancestor's containing
+     * block, which plain `position: fixed` inside a shadow tree does not.
+     */
+    interface DayPicker {
+        "days": DayOption[];
+        "label": string;
+        "recipeId": string;
+    }
+    /**
+     * A generic shell for empty results (TRD §7.1) — the app slots in the
+     * wording and, optionally, a call-to-action button.
+     */
+    interface EmptyState {
+        "heading": string;
+    }
+    /**
+     * A chip only exists while its filter is active (TRD §7.1), so it has no
+     * `active` prop and no separate `chipclear` event — removing it and
+     * clearing its dimension are the same action.
+     */
+    interface FilterChip {
+        "dimension": 'category' | 'area';
+        "label": string;
+        "value": string;
+    }
+    /**
+     * One day's column/section in the planner. Owns its complete accessible
+     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
+     * name because ARIA relationships cannot cross the shadow boundary.
+     * Deliberately has no `today` prop: the planner is a dateless recurring
+     * week (OQ-3), so there is nothing to derive "today" from.
+     */
+    interface PlannerDay {
+        /**
+          * @default false
+         */
+        "collapsed": boolean;
+        "day": DayOfWeek;
+        "dayLabel": string;
+        /**
+          * @default []
+         */
+        "entries": PlannerEntry[];
+    }
+    /**
+     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
+     * 22rem height regardless of content — recipe-card:not(:defined) must
+     * reserve the same value (TRD §6.4b).
+     */
+    interface RecipeCard {
+        /**
+          * @default false
+         */
+        "favorited": boolean;
+        "href": string;
+        "recipe": RecipeSummary;
+    }
+    /**
+     * A responsive card grid with an explicit column count (DESIGN §6.3) —
+     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
+     * the browser guessing it.
+     */
+    interface RecipeGrid {
+        /**
+          * @default 4
+         */
+        "columns": 1 | 2 | 3 | 4;
+    }
+    /**
+     * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
+     * TRD §6.4b space reservation holds and the grid does not shift when real
+     * cards arrive (D-25).
+     */
+    interface SkeletonCard {
+        /**
+          * @default 1
+         */
+        "count": number;
+    }
     /**
      * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
      * property, custom event, slot) end to end. Not part of the real component
@@ -20,11 +107,157 @@ export namespace Components {
         "note"?: SpikeNote;
     }
 }
+export interface DayPickerCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLDayPickerElement;
+}
+export interface FilterChipCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLFilterChipElement;
+}
+export interface PlannerDayCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLPlannerDayElement;
+}
+export interface RecipeCardCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLRecipeCardElement;
+}
 export interface SpikePanelCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLSpikePanelElement;
 }
 declare global {
+    interface HTMLDayPickerElementEventMap {
+        "planassign": { recipeId: string; day: DayOfWeek };
+        "pickerclose": Record<string, never>;
+    }
+    /**
+     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
+     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
+     * never inferred from a store.
+     * The panel uses the native Popover API (`popover="manual"`) so it renders
+     * in the browser's top layer — the one mechanism that reliably escapes a
+     * card's `overflow: hidden` and any transformed ancestor's containing
+     * block, which plain `position: fixed` inside a shadow tree does not.
+     */
+    interface HTMLDayPickerElement extends Components.DayPicker, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLDayPickerElementEventMap>(type: K, listener: (this: HTMLDayPickerElement, ev: DayPickerCustomEvent<HTMLDayPickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLDayPickerElementEventMap>(type: K, listener: (this: HTMLDayPickerElement, ev: DayPickerCustomEvent<HTMLDayPickerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLDayPickerElement: {
+        prototype: HTMLDayPickerElement;
+        new (): HTMLDayPickerElement;
+    };
+    /**
+     * A generic shell for empty results (TRD §7.1) — the app slots in the
+     * wording and, optionally, a call-to-action button.
+     */
+    interface HTMLEmptyStateElement extends Components.EmptyState, HTMLStencilElement {
+    }
+    var HTMLEmptyStateElement: {
+        prototype: HTMLEmptyStateElement;
+        new (): HTMLEmptyStateElement;
+    };
+    interface HTMLFilterChipElementEventMap {
+        "chiptoggle": { dimension: 'category' | 'area'; value: string };
+    }
+    /**
+     * A chip only exists while its filter is active (TRD §7.1), so it has no
+     * `active` prop and no separate `chipclear` event — removing it and
+     * clearing its dimension are the same action.
+     */
+    interface HTMLFilterChipElement extends Components.FilterChip, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLFilterChipElementEventMap>(type: K, listener: (this: HTMLFilterChipElement, ev: FilterChipCustomEvent<HTMLFilterChipElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLFilterChipElementEventMap>(type: K, listener: (this: HTMLFilterChipElement, ev: FilterChipCustomEvent<HTMLFilterChipElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLFilterChipElement: {
+        prototype: HTMLFilterChipElement;
+        new (): HTMLFilterChipElement;
+    };
+    interface HTMLPlannerDayElementEventMap {
+        "entryremove": { recipeId: string; day: DayOfWeek };
+        "entrymoverequest": { recipeId: string; fromDay: DayOfWeek };
+        "daytoggle": { day: DayOfWeek; collapsed: boolean };
+    }
+    /**
+     * One day's column/section in the planner. Owns its complete accessible
+     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
+     * name because ARIA relationships cannot cross the shadow boundary.
+     * Deliberately has no `today` prop: the planner is a dateless recurring
+     * week (OQ-3), so there is nothing to derive "today" from.
+     */
+    interface HTMLPlannerDayElement extends Components.PlannerDay, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLPlannerDayElementEventMap>(type: K, listener: (this: HTMLPlannerDayElement, ev: PlannerDayCustomEvent<HTMLPlannerDayElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLPlannerDayElementEventMap>(type: K, listener: (this: HTMLPlannerDayElement, ev: PlannerDayCustomEvent<HTMLPlannerDayElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLPlannerDayElement: {
+        prototype: HTMLPlannerDayElement;
+        new (): HTMLPlannerDayElement;
+    };
+    interface HTMLRecipeCardElementEventMap {
+        "favoritetoggle": { recipeId: string };
+        "recipeselect": { recipeId: string };
+    }
+    /**
+     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
+     * 22rem height regardless of content — recipe-card:not(:defined) must
+     * reserve the same value (TRD §6.4b).
+     */
+    interface HTMLRecipeCardElement extends Components.RecipeCard, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLRecipeCardElementEventMap>(type: K, listener: (this: HTMLRecipeCardElement, ev: RecipeCardCustomEvent<HTMLRecipeCardElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLRecipeCardElementEventMap>(type: K, listener: (this: HTMLRecipeCardElement, ev: RecipeCardCustomEvent<HTMLRecipeCardElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLRecipeCardElement: {
+        prototype: HTMLRecipeCardElement;
+        new (): HTMLRecipeCardElement;
+    };
+    /**
+     * A responsive card grid with an explicit column count (DESIGN §6.3) —
+     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
+     * the browser guessing it.
+     */
+    interface HTMLRecipeGridElement extends Components.RecipeGrid, HTMLStencilElement {
+    }
+    var HTMLRecipeGridElement: {
+        prototype: HTMLRecipeGridElement;
+        new (): HTMLRecipeGridElement;
+    };
+    /**
+     * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
+     * TRD §6.4b space reservation holds and the grid does not shift when real
+     * cards arrive (D-25).
+     */
+    interface HTMLSkeletonCardElement extends Components.SkeletonCard, HTMLStencilElement {
+    }
+    var HTMLSkeletonCardElement: {
+        prototype: HTMLSkeletonCardElement;
+        new (): HTMLSkeletonCardElement;
+    };
     interface HTMLSpikePanelElementEventMap {
         "spikeaction": SpikeNote;
     }
@@ -48,10 +281,112 @@ declare global {
         new (): HTMLSpikePanelElement;
     };
     interface HTMLElementTagNameMap {
+        "day-picker": HTMLDayPickerElement;
+        "empty-state": HTMLEmptyStateElement;
+        "filter-chip": HTMLFilterChipElement;
+        "planner-day": HTMLPlannerDayElement;
+        "recipe-card": HTMLRecipeCardElement;
+        "recipe-grid": HTMLRecipeGridElement;
+        "skeleton-card": HTMLSkeletonCardElement;
         "spike-panel": HTMLSpikePanelElement;
     }
 }
 declare namespace LocalJSX {
+    type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
+
+    /**
+     * The most-used component in the system (DESIGN §7.10) — assigns a recipe
+     * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
+     * never inferred from a store.
+     * The panel uses the native Popover API (`popover="manual"`) so it renders
+     * in the browser's top layer — the one mechanism that reliably escapes a
+     * card's `overflow: hidden` and any transformed ancestor's containing
+     * block, which plain `position: fixed` inside a shadow tree does not.
+     */
+    interface DayPicker {
+        "days": DayOption[];
+        "label": string;
+        "onPickerclose"?: (event: DayPickerCustomEvent<Record<string, never>>) => void;
+        "onPlanassign"?: (event: DayPickerCustomEvent<{ recipeId: string; day: DayOfWeek }>) => void;
+        "recipeId": string;
+    }
+    /**
+     * A generic shell for empty results (TRD §7.1) — the app slots in the
+     * wording and, optionally, a call-to-action button.
+     */
+    interface EmptyState {
+        "heading": string;
+    }
+    /**
+     * A chip only exists while its filter is active (TRD §7.1), so it has no
+     * `active` prop and no separate `chipclear` event — removing it and
+     * clearing its dimension are the same action.
+     */
+    interface FilterChip {
+        "dimension": 'category' | 'area';
+        "label": string;
+        "onChiptoggle"?: (event: FilterChipCustomEvent<{ dimension: 'category' | 'area'; value: string }>) => void;
+        "value": string;
+    }
+    /**
+     * One day's column/section in the planner. Owns its complete accessible
+     * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
+     * name because ARIA relationships cannot cross the shadow boundary.
+     * Deliberately has no `today` prop: the planner is a dateless recurring
+     * week (OQ-3), so there is nothing to derive "today" from.
+     */
+    interface PlannerDay {
+        /**
+          * @default false
+         */
+        "collapsed"?: boolean;
+        "day": DayOfWeek;
+        "dayLabel": string;
+        /**
+          * @default []
+         */
+        "entries"?: PlannerEntry[];
+        "onDaytoggle"?: (event: PlannerDayCustomEvent<{ day: DayOfWeek; collapsed: boolean }>) => void;
+        "onEntrymoverequest"?: (event: PlannerDayCustomEvent<{ recipeId: string; fromDay: DayOfWeek }>) => void;
+        "onEntryremove"?: (event: PlannerDayCustomEvent<{ recipeId: string; day: DayOfWeek }>) => void;
+    }
+    /**
+     * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
+     * 22rem height regardless of content — recipe-card:not(:defined) must
+     * reserve the same value (TRD §6.4b).
+     */
+    interface RecipeCard {
+        /**
+          * @default false
+         */
+        "favorited"?: boolean;
+        "href": string;
+        "onFavoritetoggle"?: (event: RecipeCardCustomEvent<{ recipeId: string }>) => void;
+        "onRecipeselect"?: (event: RecipeCardCustomEvent<{ recipeId: string }>) => void;
+        "recipe": RecipeSummary;
+    }
+    /**
+     * A responsive card grid with an explicit column count (DESIGN §6.3) —
+     * never `auto-fill`, so the app decides the breakpoint behaviour instead of
+     * the browser guessing it.
+     */
+    interface RecipeGrid {
+        /**
+          * @default 4
+         */
+        "columns"?: 1 | 2 | 3 | 4;
+    }
+    /**
+     * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
+     * TRD §6.4b space reservation holds and the grid does not shift when real
+     * cards arrive (D-25).
+     */
+    interface SkeletonCard {
+        /**
+          * @default 1
+         */
+        "count"?: number;
+    }
     /**
      * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
      * property, custom event, slot) end to end. Not part of the real component
@@ -67,7 +402,43 @@ declare namespace LocalJSX {
          */
         "onSpikeaction"?: (event: SpikePanelCustomEvent<SpikeNote>) => void;
     }
+
+    interface DayPickerAttributes {
+        "recipeId": string;
+        "label": string;
+    }
+    interface EmptyStateAttributes {
+        "heading": string;
+    }
+    interface FilterChipAttributes {
+        "label": string;
+        "value": string;
+        "dimension": 'category' | 'area';
+    }
+    interface PlannerDayAttributes {
+        "day": DayOfWeek;
+        "dayLabel": string;
+        "collapsed": boolean;
+    }
+    interface RecipeCardAttributes {
+        "favorited": boolean;
+        "href": string;
+    }
+    interface RecipeGridAttributes {
+        "columns": 1 | 2 | 3 | 4;
+    }
+    interface SkeletonCardAttributes {
+        "count": number;
+    }
+
     interface IntrinsicElements {
+        "day-picker": Omit<DayPicker, keyof DayPickerAttributes> & { [K in keyof DayPicker & keyof DayPickerAttributes]?: DayPicker[K] } & { [K in keyof DayPicker & keyof DayPickerAttributes as `attr:${K}`]?: DayPickerAttributes[K] } & { [K in keyof DayPicker & keyof DayPickerAttributes as `prop:${K}`]?: DayPicker[K] } & OneOf<"recipeId", DayPicker["recipeId"], DayPickerAttributes["recipeId"]> & OneOf<"label", DayPicker["label"], DayPickerAttributes["label"]>;
+        "empty-state": Omit<EmptyState, keyof EmptyStateAttributes> & { [K in keyof EmptyState & keyof EmptyStateAttributes]?: EmptyState[K] } & { [K in keyof EmptyState & keyof EmptyStateAttributes as `attr:${K}`]?: EmptyStateAttributes[K] } & { [K in keyof EmptyState & keyof EmptyStateAttributes as `prop:${K}`]?: EmptyState[K] } & OneOf<"heading", EmptyState["heading"], EmptyStateAttributes["heading"]>;
+        "filter-chip": Omit<FilterChip, keyof FilterChipAttributes> & { [K in keyof FilterChip & keyof FilterChipAttributes]?: FilterChip[K] } & { [K in keyof FilterChip & keyof FilterChipAttributes as `attr:${K}`]?: FilterChipAttributes[K] } & { [K in keyof FilterChip & keyof FilterChipAttributes as `prop:${K}`]?: FilterChip[K] } & OneOf<"label", FilterChip["label"], FilterChipAttributes["label"]> & OneOf<"value", FilterChip["value"], FilterChipAttributes["value"]> & OneOf<"dimension", FilterChip["dimension"], FilterChipAttributes["dimension"]>;
+        "planner-day": Omit<PlannerDay, keyof PlannerDayAttributes> & { [K in keyof PlannerDay & keyof PlannerDayAttributes]?: PlannerDay[K] } & { [K in keyof PlannerDay & keyof PlannerDayAttributes as `attr:${K}`]?: PlannerDayAttributes[K] } & { [K in keyof PlannerDay & keyof PlannerDayAttributes as `prop:${K}`]?: PlannerDay[K] } & OneOf<"day", PlannerDay["day"], PlannerDayAttributes["day"]> & OneOf<"dayLabel", PlannerDay["dayLabel"], PlannerDayAttributes["dayLabel"]>;
+        "recipe-card": Omit<RecipeCard, keyof RecipeCardAttributes> & { [K in keyof RecipeCard & keyof RecipeCardAttributes]?: RecipeCard[K] } & { [K in keyof RecipeCard & keyof RecipeCardAttributes as `attr:${K}`]?: RecipeCardAttributes[K] } & { [K in keyof RecipeCard & keyof RecipeCardAttributes as `prop:${K}`]?: RecipeCard[K] } & OneOf<"href", RecipeCard["href"], RecipeCardAttributes["href"]>;
+        "recipe-grid": Omit<RecipeGrid, keyof RecipeGridAttributes> & { [K in keyof RecipeGrid & keyof RecipeGridAttributes]?: RecipeGrid[K] } & { [K in keyof RecipeGrid & keyof RecipeGridAttributes as `attr:${K}`]?: RecipeGridAttributes[K] } & { [K in keyof RecipeGrid & keyof RecipeGridAttributes as `prop:${K}`]?: RecipeGrid[K] };
+        "skeleton-card": Omit<SkeletonCard, keyof SkeletonCardAttributes> & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes]?: SkeletonCard[K] } & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes as `attr:${K}`]?: SkeletonCardAttributes[K] } & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes as `prop:${K}`]?: SkeletonCard[K] };
         "spike-panel": SpikePanel;
     }
 }
@@ -75,6 +446,53 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            /**
+             * The most-used component in the system (DESIGN §7.10) — assigns a recipe
+             * to a day of the plan. Stateless: occupancy is an input (`DayOption.occupied`),
+             * never inferred from a store.
+             * The panel uses the native Popover API (`popover="manual"`) so it renders
+             * in the browser's top layer — the one mechanism that reliably escapes a
+             * card's `overflow: hidden` and any transformed ancestor's containing
+             * block, which plain `position: fixed` inside a shadow tree does not.
+             */
+            "day-picker": LocalJSX.IntrinsicElements["day-picker"] & JSXBase.HTMLAttributes<HTMLDayPickerElement>;
+            /**
+             * A generic shell for empty results (TRD §7.1) — the app slots in the
+             * wording and, optionally, a call-to-action button.
+             */
+            "empty-state": LocalJSX.IntrinsicElements["empty-state"] & JSXBase.HTMLAttributes<HTMLEmptyStateElement>;
+            /**
+             * A chip only exists while its filter is active (TRD §7.1), so it has no
+             * `active` prop and no separate `chipclear` event — removing it and
+             * clearing its dimension are the same action.
+             */
+            "filter-chip": LocalJSX.IntrinsicElements["filter-chip"] & JSXBase.HTMLAttributes<HTMLFilterChipElement>;
+            /**
+             * One day's column/section in the planner. Owns its complete accessible
+             * name from its own props (D-22, D-32) — `dayLabel` becomes the region's
+             * name because ARIA relationships cannot cross the shadow boundary.
+             * Deliberately has no `today` prop: the planner is a dateless recurring
+             * week (OQ-3), so there is nothing to derive "today" from.
+             */
+            "planner-day": LocalJSX.IntrinsicElements["planner-day"] & JSXBase.HTMLAttributes<HTMLPlannerDayElement>;
+            /**
+             * The app's primary discovery/favorites/planner unit (DESIGN §7.1). Fixed
+             * 22rem height regardless of content — recipe-card:not(:defined) must
+             * reserve the same value (TRD §6.4b).
+             */
+            "recipe-card": LocalJSX.IntrinsicElements["recipe-card"] & JSXBase.HTMLAttributes<HTMLRecipeCardElement>;
+            /**
+             * A responsive card grid with an explicit column count (DESIGN §6.3) —
+             * never `auto-fill`, so the app decides the breakpoint behaviour instead of
+             * the browser guessing it.
+             */
+            "recipe-grid": LocalJSX.IntrinsicElements["recipe-grid"] & JSXBase.HTMLAttributes<HTMLRecipeGridElement>;
+            /**
+             * Loading placeholder that matches `recipe-card`'s geometry exactly, so the
+             * TRD §6.4b space reservation holds and the grid does not shift when real
+             * cards arrive (D-25).
+             */
+            "skeleton-card": LocalJSX.IntrinsicElements["skeleton-card"] & JSXBase.HTMLAttributes<HTMLSkeletonCardElement>;
             /**
              * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
              * property, custom event, slot) end to end. Not part of the real component
