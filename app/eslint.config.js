@@ -58,10 +58,10 @@ export default defineConfig(
 				{ name: 'customElements', message: 'Guard with `browser` from $app/environment; never touch at module scope.' },
 				{ name: 'window', message: 'Guard with `browser` from $app/environment; never touch at module scope.' },
 			],
-			// The nav (Phase 1) links to /my-recipes, /favorites and /planner before those
-			// route folders exist (Phases 6-8), so $app/paths' resolve() can't type-check
-			// them yet. Plain hrefs are fine here — this app has no base path or reroute
-			// config for resolve() to protect against.
+			// The nav links to /my-recipes, /favorites and /planner before those route
+			// folders exist yet, so $app/paths' resolve() can't type-check them. Plain
+			// hrefs are fine here — this app has no base path or reroute config for
+			// resolve() to protect against.
 			'svelte/no-navigation-without-resolve': 'off',
 		},
 	},

@@ -1,6 +1,6 @@
-// Toast system — FLOWS.md UX-3: bottom-centre, 4s auto-dismiss, manually dismissible,
-// role="status" aria-live="polite", max 3 stacked. Feature phases call addToast(); the
-// layout renders whatever is here.
+// Toast system — bottom-centre, 4s auto-dismiss, manually dismissible,
+// role="status" aria-live="polite", max 3 stacked. Call addToast() from anywhere;
+// the layout renders whatever is here.
 
 export interface Toast {
 	id: number;
