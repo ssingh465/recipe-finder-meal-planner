@@ -1,0 +1,63 @@
+@import url('./tokens.css');
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	background: var(--c-bg);
+	color: var(--c-text);
+	font-family: var(--font-text);
+	font-size: var(--fs-body);
+	line-height: 1.6;
+	min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+	font-family: var(--font-display);
+	font-variation-settings:
+		'SOFT' 30,
+		'WONK' 1;
+	letter-spacing: -0.01em;
+	margin: 0;
+}
+
+img,
+picture,
+svg {
+	max-width: 100%;
+	display: block;
+}
+
+a {
+	color: inherit;
+}
+
+button {
+	font-family: inherit;
+}
+
+/* No horizontal scroll at any width — wide content scrolls inside its own container. */
+html,
+body {
+	overflow-x: hidden;
+}
+
+:focus-visible {
+	outline: none;
+	box-shadow: var(--focus-ring);
+	border-radius: var(--r-sm);
+}
+
+:focus:not(:focus-visible) {
+	outline: none;
+}

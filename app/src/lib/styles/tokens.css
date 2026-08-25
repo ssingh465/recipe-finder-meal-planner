@@ -1,0 +1,150 @@
+/* Design tokens — DESIGN.md §3 (colour), §4 (type), §5 (spacing/radii/elevation/motion),
+   §6.1 (z-index), §10.1 (--rc-* library contract). Every token referenced by name elsewhere;
+   never duplicate a raw value in feature code. */
+
+:root {
+	/* Warm neutral surfaces */
+	--c-bg: #fdfbf7;
+	--c-surface: #fff;
+	--c-surface-sunken: #f6f1e9;
+	--c-border: #e7dfd3;
+	--c-border-strong: #d4c8b8;
+
+	/* Text */
+	--c-text: #2a2420;
+	--c-text-muted: #6b5f55;
+	--c-text-subtle: #8f8377;
+
+	/* Accent — terracotta */
+	--c-accent: #bc4e1c;
+	--c-accent-hover: #a34216;
+	--c-accent-subtle: #fbede4;
+	--c-accent-border: #efcdb6;
+	--c-on-accent: #fff;
+
+	/* Semantic */
+	--c-success: #2f7a4f;
+	--c-success-subtle: #e6f2ea;
+	--c-error: #a81e2d;
+	--c-error-subtle: #fbe9ea;
+	--c-on-error: #fff;
+	--c-warning: #7a5200;
+	--c-warning-subtle: #fff4dc;
+
+	/* Focus ring — theme-independent declaration; renders differently per theme */
+	--focus-ring: 0 0 0 2px var(--c-bg), 0 0 0 4px var(--c-text);
+
+	/* Typography */
+	--font-display: 'Fraunces', georgia, 'Times New Roman', serif;
+	--font-text: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--fs-display: clamp(2rem, 4vw, 2.75rem);
+	--fs-h1: clamp(1.75rem, 3vw, 2.25rem);
+	--fs-h2: 1.5rem;
+	--fs-h3: 1.25rem;
+	--fs-body-lg: 1.0625rem;
+	--fs-body: 1rem;
+	--fs-sm: 0.875rem;
+	--fs-xs: 0.75rem;
+
+	/* Spacing — 4px base */
+	--s-1: 0.25rem;
+	--s-2: 0.5rem;
+	--s-3: 0.75rem;
+	--s-4: 1rem;
+	--s-5: 1.5rem;
+	--s-6: 2rem;
+	--s-7: 3rem;
+	--s-8: 4rem;
+
+	/* Radii */
+	--r-sm: 6px;
+	--r-md: 10px;
+	--r-lg: 14px;
+	--r-full: 999px;
+
+	/* Elevation */
+	--sh-1: 0 1px 2px rgb(42 36 32 / 6%), 0 1px 3px rgb(42 36 32 / 4%);
+	--sh-2: 0 2px 8px rgb(42 36 32 / 8%);
+	--sh-3: 0 8px 24px rgb(42 36 32 / 12%);
+
+	/* Motion */
+	--dur-micro: 120ms;
+	--dur-base: 180ms;
+	--dur-modal: 240ms;
+	--ease: cubic-bezier(0.2, 0, 0.2, 1);
+
+	/* z-index scale — DESIGN §6.1. Use these names, never a bare number. */
+	--z-header: 100;
+	--z-dropdown: 200;
+	--z-toast: 300;
+	--z-modal-backdrop: 400;
+	--z-modal: 410;
+
+	/* --rc-* — the library's only styling channel (DESIGN §10.1). Mapped once, here. */
+	--rc-surface: var(--c-surface);
+	--rc-surface-sunken: var(--c-surface-sunken);
+	--rc-border: var(--c-border);
+	--rc-border-strong: var(--c-border-strong);
+	--rc-text: var(--c-text);
+	--rc-text-muted: var(--c-text-muted);
+	--rc-text-subtle: var(--c-text-subtle);
+	--rc-accent: var(--c-accent);
+	--rc-accent-subtle: var(--c-accent-subtle);
+	--rc-accent-border: var(--c-accent-border);
+	--rc-on-accent: var(--c-on-accent);
+	--rc-font-display: var(--font-display);
+	--rc-font-text: var(--font-text);
+	--rc-fs-h3: var(--fs-h3);
+	--rc-fs-body: var(--fs-body);
+	--rc-fs-sm: var(--fs-sm);
+	--rc-fs-xs: var(--fs-xs);
+	--rc-s-1: var(--s-1);
+	--rc-s-2: var(--s-2);
+	--rc-s-3: var(--s-3);
+	--rc-s-4: var(--s-4);
+	--rc-s-5: var(--s-5);
+	--rc-s-6: var(--s-6);
+	--rc-radius: var(--r-lg);
+	--rc-radius-sm: var(--r-sm);
+	--rc-radius-full: var(--r-full);
+	--rc-shadow: var(--sh-1);
+	--rc-shadow-hover: var(--sh-2);
+	--rc-focus-ring: var(--focus-ring);
+	--rc-duration: var(--dur-base);
+	--rc-ease: var(--ease);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--c-bg: #17130f;
+		--c-surface: #1f1a16;
+		--c-surface-sunken: #14100d;
+		--c-border: #332b24;
+		--c-border-strong: #4a3f35;
+		--c-text: #f5efe7;
+		--c-text-muted: #b8aa9c;
+		--c-text-subtle: #8f8377;
+		--c-accent: #e8763c;
+		--c-accent-hover: #f08a54;
+		--c-accent-subtle: #2e1d13;
+		--c-accent-border: #4a2e1d;
+		--c-on-accent: #1a1008;
+		--c-success: #5fb784;
+		--c-success-subtle: #16281e;
+		--c-error: #f2848c;
+		--c-error-subtle: #2c1517;
+		--c-on-error: #2c1517;
+		--c-warning: #e0b15c;
+		--c-warning-subtle: #2a2010;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
