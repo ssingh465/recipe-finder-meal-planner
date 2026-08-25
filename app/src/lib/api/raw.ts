@@ -5,7 +5,7 @@ export interface RawMeal {
 	idMeal: string;
 	strMeal: string;
 	strMealThumb: string | null;
-	strCategory?: string | null; // absent from filter.php responses (TRD §8.1.1)
+	strCategory?: string | null; // absent from filter.php responses
 	strArea?: string | null;
 	strInstructions?: string | null;
 	strTags?: string | null; // comma-separated, e.g. "Pasta,Curry"

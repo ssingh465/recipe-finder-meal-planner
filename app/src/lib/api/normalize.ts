@@ -40,7 +40,7 @@ export function toTags(raw: RawMeal): string[] {
 }
 
 /**
- * `filter.php?c=` responses omit `strCategory` (TRD §8.1.1), so a card built from a
+ * `filter.php?c=` responses omit `strCategory`, so a card built from a
  * category-filtered response would otherwise show a blank category on the very screen
  * that filtered by it. `context` back-fills from the active filter that produced the row.
  */

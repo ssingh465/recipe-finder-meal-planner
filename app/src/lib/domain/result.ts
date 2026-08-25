@@ -10,5 +10,5 @@ export type Failure =
 	| { kind: 'storage'; message: string }; // quota exceeded / storage unavailable
 
 export type Result<T> =
-	| { ok: true; data: T; truncated?: boolean } // truncated: response held exactly 100 (TRD §8.2)
+	| { ok: true; data: T; truncated?: boolean } // truncated: response held exactly 100
 	| ({ ok: false } & Failure);

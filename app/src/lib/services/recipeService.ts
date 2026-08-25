@@ -1,6 +1,6 @@
-// Composes the three stores (TRD §6.1) — this is what makes the delete cascade atomic
-// across recipes, favorites and the plan. Stores never call this; the dependency runs
-// one way, service -> stores.
+// Composes the three stores — this is what makes the delete cascade atomic across
+// recipes, favorites and the plan. Stores never call this; the dependency runs one
+// way, service -> stores.
 import * as mealDbClient from '$lib/api/mealDbClient';
 import type { DayOfWeek } from '$lib/domain/day';
 import type { Recipe, RecipeInput, RecipeSummary } from '$lib/domain/recipe';
@@ -23,7 +23,7 @@ export const recipeService = {
 		return mealDbClient.browse(signal);
 	},
 
-	/** Category outranks Area when both are active (D-16) — only `filter.php?c=` carries `strArea` for refinement. */
+	/** Category outranks Area when both are active — only `filter.php?c=` carries `strArea` for refinement. */
 	filter(f: { category?: string; area?: string }, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
 		if (f.category) return mealDbClient.filterByCategory(f.category, signal);
 		if (f.area) return mealDbClient.filterByArea(f.area, signal);
@@ -60,7 +60,7 @@ export const recipeService = {
 	},
 
 	/**
-	 * Pure read — computes the cascade without applying it (D-30), so the confirmation
+	 * Pure read — computes the cascade without applying it, so the confirmation
 	 * dialog can itemise consequences before the user commits, and Cancel changes nothing.
 	 */
 	previewRemoval(id: string): { unfavorited: boolean; clearedDays: DayOfWeek[] } {

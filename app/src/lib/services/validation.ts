@@ -1,5 +1,5 @@
-// Single validation module, shared by create and edit (TRD §8.6, DATA-MODEL §7).
-// Data-quality control, not a security boundary — there is no trust boundary here to defend.
+// Single validation module, shared by create and edit. Data-quality control, not
+// a security boundary — there is no trust boundary here to defend.
 import type { RecipeInput } from '$lib/domain/recipe';
 import type { FieldErrors } from '$lib/domain/result';
 

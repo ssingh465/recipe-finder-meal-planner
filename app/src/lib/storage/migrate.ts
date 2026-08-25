@@ -1,5 +1,5 @@
-// Schema versioning (TRD §4.5, DATA-MODEL §10). Each storage key wraps its data in its
-// own `{ v, data }` envelope so one collection's shape change can't cascade into another's.
+// Schema versioning. Each storage key wraps its data in its own `{ v, data }`
+// envelope so one collection's shape change can't cascade into another's.
 export const SCHEMA_VERSION = 1;
 
 export interface Envelope<T> {
@@ -13,7 +13,7 @@ export function wrapEnvelope<T>(data: T): Envelope<T> {
 
 /**
  * On a missing/unparseable envelope or a version mismatch, resets to `fallback` rather
- * than transforming — there is no prior released shape to migrate from (D-24).
+ * than transforming — there is no prior released shape to migrate from.
  */
 export function unwrapEnvelope<T>(parsed: unknown, fallback: T): T {
 	if (

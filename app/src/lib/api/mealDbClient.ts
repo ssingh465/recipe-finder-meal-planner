@@ -1,4 +1,4 @@
-// TheMealDB adapter. See TRD §8.1 — no auth, HTTPS only, one filter parameter per call.
+// TheMealDB adapter — no auth, HTTPS only, one filter parameter per call.
 import type { Recipe, RecipeSummary } from '$lib/domain/recipe';
 import type { Result } from '$lib/domain/result';
 import { toRecipe, toSummary, type FilterContext } from './normalize';
@@ -31,7 +31,7 @@ async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<Result<T
 }
 
 function toSummaryList(meals: RawMealsResponse['meals'], context?: FilterContext): RecipeSummary[] {
-	// {"meals": null} is TheMealDB's empty result, not an error (§8.2) — it becomes [], not a Failure.
+	// {"meals": null} is TheMealDB's empty result, not an error — it becomes [], not a Failure.
 	return meals?.map((meal) => toSummary(meal, context)) ?? [];
 }
 
@@ -41,7 +41,7 @@ export async function search(query: string, signal?: AbortSignal): Promise<Resul
 	return { ok: true, data: toSummaryList(result.data.meals) };
 }
 
-/** `search.php?s=` with no query — TheMealDB's browse default (F1.2). */
+/** `search.php?s=` with no query — TheMealDB's browse default. */
 export function browse(signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
 	return search('', signal);
 }
@@ -58,7 +58,7 @@ async function filterBy(
 	);
 	if (!result.ok) return result;
 	const data = toSummaryList(result.data.meals, context);
-	// filter.php caps silently at exactly 100 (TRD §8.1 point 2) — flag it, never hide it.
+	// filter.php caps silently at exactly 100 — flag it, never hide it.
 	return data.length === 100 ? { ok: true, data, truncated: true } : { ok: true, data };
 }
 
@@ -84,7 +84,7 @@ export async function listCategories(signal?: AbortSignal): Promise<Result<strin
 	return { ok: true, data: (result.data.meals ?? []).map((meal) => meal.strCategory) };
 }
 
-/** 300ms debounce for the search input (TRD §8.2 client requirements). */
+/** 300ms debounce for the search input. */
 export function debounce<Args extends unknown[]>(
 	fn: (...args: Args) => void,
 	delayMs = 300

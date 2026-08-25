@@ -1,5 +1,4 @@
-// TRD §4.4.1 / DATA-MODEL §3.1. Holds user-created recipes only — API recipes are
-// never persisted (DATA-MODEL §2.1).
+// Holds user-created recipes only — API recipes are never persisted.
 import { browser } from '$app/environment';
 import { readKey, writeKey } from '$lib/storage/local';
 import type { Recipe, RecipeInput } from '$lib/domain/recipe';
@@ -19,7 +18,7 @@ function nowIso(): string {
 let items = $state<Recipe[]>([]);
 let hydrated = $state(false);
 
-// O(1) lookup by id (DATA-MODEL §6.2) — recomputed only when `items` changes.
+// O(1) lookup by id — recomputed only when `items` changes.
 const byIdMap = $derived(new Map(items.map((recipe) => [recipe.id, recipe])));
 
 export const recipes = {
@@ -31,7 +30,7 @@ export const recipes = {
 		return byIdMap.get(id);
 	},
 
-	/** Newest first, by `createdAt` (FLOWS §7.2). */
+	/** Newest first, by `createdAt`. */
 	list(): Recipe[] {
 		return [...items].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 	},
@@ -68,7 +67,7 @@ export const recipes = {
 		const index = items.findIndex((recipe) => recipe.id === id);
 		if (index === -1) return undefined;
 
-		// id is immutable across updates; createdAt untouched, updatedAt refreshed (DATA-MODEL §5.3).
+		// id is immutable across updates; createdAt untouched, updatedAt refreshed.
 		const updated: Recipe = { ...items[index], ...input, updatedAt: nowIso() };
 		items = items.map((recipe, i) => (i === index ? updated : recipe));
 		writeKey(KEY, items);

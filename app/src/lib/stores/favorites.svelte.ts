@@ -1,4 +1,4 @@
-// TRD §4.4 / §4.4.1. A Set backs the hot path — isFavorited runs ~24x per discovery render.
+// A Set backs the hot path — isFavorited runs ~24x per discovery render.
 import { SvelteSet } from 'svelte/reactivity';
 import { readKey, writeKey } from '$lib/storage/local';
 
@@ -34,10 +34,10 @@ export const favorites = {
 	toggle(id: string) {
 		if (ids.has(id)) ids.delete(id);
 		else ids.add(id);
-		writeKey(KEY, [...ids]); // always an array — see DATA-MODEL §6.3
+		writeKey(KEY, [...ids]); // always an array — a Set serializes to `{}`, never persist it directly
 	},
 
-	/** Idempotent. Cascade target for recipeService.remove() (DATA-MODEL §5.3). */
+	/** Idempotent. Cascade target for recipeService.remove(). */
 	remove(id: string) {
 		if (!ids.has(id)) return;
 		ids.delete(id);

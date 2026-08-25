@@ -1,5 +1,4 @@
-// TRD §4.4.1. Module is `planner.svelte.ts`; the exported binding is `plan` (both names
-// appear throughout the planning docs and refer to the same thing).
+// Module is `planner.svelte.ts`; the exported binding is `plan`.
 import { readKey, writeKey } from '$lib/storage/local';
 import { DAYS, type DayOfWeek } from '$lib/domain/day';
 
@@ -14,7 +13,7 @@ function emptyWeek(): Week {
 let week = $state<Week>(emptyWeek());
 let hydrated = $state(false);
 
-// O(1) duplicate check per day (DATA-MODEL §6.2) — recomputed only when `week` changes.
+// O(1) duplicate check per day — recomputed only when `week` changes.
 const daySets = $derived<Record<DayOfWeek, Set<string>>>(
 	Object.fromEntries(DAYS.map((day) => [day, new Set(week[day])])) as Record<DayOfWeek, Set<string>>
 );
@@ -45,7 +44,7 @@ export const plan = {
 		hydrated = true;
 	},
 
-	/** `false` and no-op if the day already holds this id (DATA-MODEL §4.2). */
+	/** `false` and no-op if the day already holds this id. */
 	assign(day: DayOfWeek, recipeId: string): boolean {
 		if (daySets[day].has(recipeId)) return false;
 		week = { ...week, [day]: [...week[day], recipeId] };
@@ -61,7 +60,7 @@ export const plan = {
 
 	/**
 	 * `false` if `fromDay` doesn't hold the id, or `toDay` already does. Otherwise
-	 * atomic — one state update, never remove-then-assign (D-18): that would open a
+	 * atomic — one state update, never remove-then-assign: that would open a
 	 * window where the entry exists in neither day, or in both if the ordering flips.
 	 */
 	move(recipeId: string, fromDay: DayOfWeek, toDay: DayOfWeek): boolean {
@@ -75,7 +74,7 @@ export const plan = {
 		return true;
 	},
 
-	/** Cascade target for recipeService.remove() (DATA-MODEL §5.3). Returns the cleared days. */
+	/** Cascade target for recipeService.remove(). Returns the cleared days. */
 	removeEverywhere(recipeId: string): DayOfWeek[] {
 		const affected = plan.daysContaining(recipeId);
 		if (affected.length === 0) return [];

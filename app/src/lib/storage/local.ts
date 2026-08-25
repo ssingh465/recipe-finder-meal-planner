@@ -1,7 +1,7 @@
-// The only module that touches `localStorage` (TRD §4.4). Every store reaches
-// persistence through readKey/writeKey — never localStorage directly — so the SSR
-// guard, the try/catch, the corrupt-JSON reset, and the storage-fault signal all live
-// in exactly one place.
+// The only module that touches `localStorage`. Every store reaches persistence
+// through readKey/writeKey — never localStorage directly — so the SSR guard, the
+// try/catch, the corrupt-JSON reset, and the storage-fault signal all live in
+// exactly one place.
 import { browser } from '$app/environment';
 import { setStorageFault, storageStatus, type StorageFault } from '$lib/stores/storage-status.svelte';
 import { unwrapEnvelope, wrapEnvelope } from './migrate';
