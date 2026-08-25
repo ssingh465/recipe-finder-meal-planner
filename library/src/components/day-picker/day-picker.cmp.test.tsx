@@ -49,6 +49,18 @@ describe('day-picker', () => {
     expect(closes).toEqual([{}]);
   });
 
+  it('opens without throwing when days has not arrived as an array yet', async () => {
+    // Regression: a custom element upgraded from server-rendered HTML sees
+    // the attribute form of an array prop (its string coercion) before
+    // Svelte assigns the real property.
+    const { root, waitForChanges } = await render(
+      <day-picker recipeId="52772" days={'mon,tue' as unknown as never} label="Add to plan"></day-picker>,
+    );
+    root.shadowRoot?.querySelector<HTMLButtonElement>('.trigger')?.click();
+    await waitForChanges();
+    expect(root.shadowRoot?.querySelectorAll('.day').length).toBe(0);
+  });
+
   it('does not assign when an occupied day is clicked', async () => {
     const { root, waitForChanges } = await render(
       <day-picker recipeId="52772" days={days} label="Add to plan"></day-picker>,

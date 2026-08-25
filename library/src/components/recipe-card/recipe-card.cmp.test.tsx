@@ -58,6 +58,16 @@ describe('recipe-card', () => {
     expect(events).toEqual([{ recipeId: '52772' }]);
   });
 
+  it('renders nothing rather than throwing when recipe has not arrived as an object yet', async () => {
+    // Regression: a custom element upgraded from server-rendered HTML sees
+    // the attribute form of an object prop (its string coercion) before
+    // Svelte assigns the real property.
+    const { root } = await render(
+      <recipe-card recipe={'[object Object]' as unknown as never} href="/recipes/1"></recipe-card>,
+    );
+    expect(root.shadowRoot?.querySelector('.card')).toBeNull();
+  });
+
   it('projects content into the actions slot', async () => {
     const { root } = await render(
       <recipe-card recipe={recipe} href="/recipes/52772">

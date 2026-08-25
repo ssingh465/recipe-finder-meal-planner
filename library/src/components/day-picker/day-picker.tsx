@@ -79,6 +79,13 @@ export class DayPicker {
     if (returnFocus) this.triggerEl?.focus();
   };
 
+  // Svelte assigns object/array properties on custom elements only after
+  // they've upgraded; a render (or keyboard handler) in the narrow window
+  // before that must see an empty list, never throw on a stringified attribute.
+  private get safeDays(): DayOption[] {
+    return Array.isArray(this.days) ? this.days : [];
+  }
+
   private selectDay(option: DayOption) {
     if (option.occupied) return;
     this.planassign.emit({ recipeId: this.recipeId, day: option.day });
@@ -86,7 +93,8 @@ export class DayPicker {
   }
 
   private focusIndex(index: number) {
-    const count = this.days.length;
+    const count = this.safeDays.length;
+    if (count === 0) return;
     this.activeIndex = (index + count) % count;
     this.dayEls[this.activeIndex]?.focus();
   }
@@ -107,7 +115,7 @@ export class DayPicker {
         break;
       case 'End':
         event.preventDefault();
-        this.focusIndex(this.days.length - 1);
+        this.focusIndex(this.safeDays.length - 1);
         break;
       case 'Tab':
         event.preventDefault();
@@ -122,7 +130,8 @@ export class DayPicker {
   };
 
   render() {
-    const { days, open, activeIndex } = this;
+    const { open, activeIndex } = this;
+    const days = this.safeDays;
     return (
       <Host>
         <button
