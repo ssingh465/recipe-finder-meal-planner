@@ -10,10 +10,10 @@ interface RawCategoryListResponse {
 	meals: { strCategory: string }[] | null;
 }
 
-async function fetchJson<T>(url: string, signal?: AbortSignal): Promise<Result<T>> {
+async function fetchJson<T>(url: string, signal?: AbortSignal, fetchImpl: typeof fetch = fetch): Promise<Result<T>> {
 	let response: Response;
 	try {
-		response = await fetch(url, { signal });
+		response = await fetchImpl(url, { signal });
 	} catch (err) {
 		// Rethrow aborts — a superseded request is not a failure to report; the caller's
 		// newer request wins and this one's result is simply discarded.
@@ -35,26 +35,36 @@ function toSummaryList(meals: RawMealsResponse['meals'], context?: FilterContext
 	return meals?.map((meal) => toSummary(meal, context)) ?? [];
 }
 
-export async function search(query: string, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-	const result = await fetchJson<RawMealsResponse>(`${BASE_URL}/search.php?s=${encodeURIComponent(query)}`, signal);
+export async function search(
+	query: string,
+	signal?: AbortSignal,
+	fetchImpl?: typeof fetch
+): Promise<Result<RecipeSummary[]>> {
+	const result = await fetchJson<RawMealsResponse>(
+		`${BASE_URL}/search.php?s=${encodeURIComponent(query)}`,
+		signal,
+		fetchImpl
+	);
 	if (!result.ok) return result;
 	return { ok: true, data: toSummaryList(result.data.meals) };
 }
 
 /** `search.php?s=` with no query — TheMealDB's browse default. */
-export function browse(signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-	return search('', signal);
+export function browse(signal?: AbortSignal, fetchImpl?: typeof fetch): Promise<Result<RecipeSummary[]>> {
+	return search('', signal, fetchImpl);
 }
 
 async function filterBy(
 	param: 'c' | 'a',
 	value: string,
-	signal?: AbortSignal
+	signal?: AbortSignal,
+	fetchImpl?: typeof fetch
 ): Promise<Result<RecipeSummary[]>> {
 	const context: FilterContext = param === 'c' ? { category: value } : { area: value };
 	const result = await fetchJson<RawMealsResponse>(
 		`${BASE_URL}/filter.php?${param}=${encodeURIComponent(value)}`,
-		signal
+		signal,
+		fetchImpl
 	);
 	if (!result.ok) return result;
 	const data = toSummaryList(result.data.meals, context);
@@ -62,12 +72,20 @@ async function filterBy(
 	return data.length === 100 ? { ok: true, data, truncated: true } : { ok: true, data };
 }
 
-export function filterByCategory(category: string, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-	return filterBy('c', category, signal);
+export function filterByCategory(
+	category: string,
+	signal?: AbortSignal,
+	fetchImpl?: typeof fetch
+): Promise<Result<RecipeSummary[]>> {
+	return filterBy('c', category, signal, fetchImpl);
 }
 
-export function filterByArea(area: string, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-	return filterBy('a', area, signal);
+export function filterByArea(
+	area: string,
+	signal?: AbortSignal,
+	fetchImpl?: typeof fetch
+): Promise<Result<RecipeSummary[]>> {
+	return filterBy('a', area, signal, fetchImpl);
 }
 
 export async function lookup(id: string, signal?: AbortSignal): Promise<Result<Recipe>> {

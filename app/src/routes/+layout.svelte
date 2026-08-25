@@ -4,8 +4,19 @@
 	import Header from '$lib/components/shell/Header.svelte';
 	import StorageBanner from '$lib/components/shell/StorageBanner.svelte';
 	import ToastLayer from '$lib/components/shell/ToastLayer.svelte';
+	import { favorites } from '$lib/stores/favorites.svelte';
+	import { plan } from '$lib/stores/planner.svelte';
+	import { recipes } from '$lib/stores/recipes.svelte';
 
 	let { children } = $props();
+
+	// $effect never runs during SSR, so this is the client-only hydration point for
+	// all three stores — every route below can read them without racing storage.
+	$effect(() => {
+		favorites.hydrate();
+		plan.hydrate();
+		recipes.hydrate();
+	});
 </script>
 
 <svelte:head>

@@ -3,7 +3,7 @@
 // way, service -> stores.
 import * as mealDbClient from '$lib/api/mealDbClient';
 import type { DayOfWeek } from '$lib/domain/day';
-import type { Recipe, RecipeInput, RecipeSummary } from '$lib/domain/recipe';
+import type { Recipe, RecipeInput } from '$lib/domain/recipe';
 import type { Result } from '$lib/domain/result';
 import { favorites } from '$lib/stores/favorites.svelte';
 import { plan } from '$lib/stores/planner.svelte';
@@ -15,21 +15,6 @@ function isUserRecipeId(id: string): boolean {
 }
 
 export const recipeService = {
-	search(query: string, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-		return mealDbClient.search(query, signal);
-	},
-
-	browse(signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-		return mealDbClient.browse(signal);
-	},
-
-	/** Category outranks Area when both are active — only `filter.php?c=` carries `strArea` for refinement. */
-	filter(f: { category?: string; area?: string }, signal?: AbortSignal): Promise<Result<RecipeSummary[]>> {
-		if (f.category) return mealDbClient.filterByCategory(f.category, signal);
-		if (f.area) return mealDbClient.filterByArea(f.area, signal);
-		return mealDbClient.browse(signal);
-	},
-
 	async getById(id: string, signal?: AbortSignal): Promise<Result<Recipe>> {
 		if (isUserRecipeId(id)) {
 			const recipe = recipes.byId(id);
