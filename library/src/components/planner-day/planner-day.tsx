@@ -1,6 +1,7 @@
 import { Component, Prop, Event, EventEmitter, Host, h } from '@stencil/core';
 import type { DayOfWeek, PlannerEntry } from '../../utils/types';
 import { ArrowRightLeftIcon, ChevronDownIcon, Trash2Icon } from '../../utils/icons';
+import { tileHue } from '../../utils/tile-hue';
 
 /**
  * One day's column/section in the planner. Owns its complete accessible
@@ -30,14 +31,24 @@ export class PlannerDay {
     this.daytoggle.emit({ day: this.day, collapsed: !this.collapsed });
   };
 
+  // Mirrors <recipe-card>'s image-less treatment (utils/tile-hue) so the same
+  // recipe reads as the same colour everywhere it appears without a thumbnail.
+  private renderThumb(entry: PlannerEntry) {
+    if (entry.thumbnail) {
+      return <img class="thumb" src={entry.thumbnail} alt="" loading="lazy" decoding="async" />;
+    }
+    const hue = tileHue(entry.name);
+    return (
+      <span class="thumb tile" aria-hidden="true" style={{ '--tile-h': String(hue) }}>
+        {entry.name.charAt(0).toUpperCase()}
+      </span>
+    );
+  }
+
   private renderEntry(entry: PlannerEntry) {
     return (
       <li part="entry" class="entry" key={entry.recipeId}>
-        {entry.thumbnail ? (
-          <img class="thumb" src={entry.thumbnail} alt="" loading="lazy" decoding="async" />
-        ) : (
-          <span class="thumb placeholder" aria-hidden="true"></span>
-        )}
+        {this.renderThumb(entry)}
         <button
           type="button"
           class="name"

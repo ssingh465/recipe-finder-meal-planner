@@ -79,14 +79,32 @@
 
 .thumb {
   flex: none;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: var(--rc-radius-sm, 6px);
   object-fit: cover;
 }
 
-.thumb.placeholder {
-  background: var(--rc-border, #e7dfd3);
+/* Same procedural hue as <recipe-card>'s image-less tile (utils/tile-hue) —
+   a raw hsl() derived from the name, not a --rc-* token, so it needs the same
+   explicit dark-mode swap <recipe-card> uses rather than the app's --rc-*
+   remapping. */
+.thumb.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--tile-h) 42% 88%);
+  color: hsl(var(--tile-h) 45% 28%);
+  font-family: var(--rc-font-display, Georgia, serif);
+  font-size: var(--rc-fs-body, 1rem);
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: dark) {
+  .thumb.tile {
+    background: hsl(var(--tile-h) 30% 22%);
+    color: hsl(var(--tile-h) 35% 82%);
+  }
 }
 
 .name {
@@ -98,9 +116,10 @@
   background: transparent;
   border: none;
   padding: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   text-align: start;
   cursor: pointer;
 }
