@@ -20,6 +20,15 @@ describe('planner-day', () => {
     expect(rows?.[1].querySelectorAll('.icon-button').length).toBe(2);
   });
 
+  it('renders a typographic tile in place of a thumbnail when there is none', async () => {
+    const { root } = await render(<planner-day day="mon" dayLabel="Monday" entries={entries}></planner-day>);
+    const rows = root.shadowRoot?.querySelectorAll('.entry');
+    expect(rows?.[0].querySelector('img.thumb')).not.toBeNull();
+    const tile = rows?.[1].querySelector('.thumb.tile');
+    expect(tile).not.toBeNull();
+    expect(tile?.textContent).toBe('B');
+  });
+
   it('emits entryremove with the recipeId and this day', async () => {
     const { root, waitForChanges } = await render(<planner-day day="tue" dayLabel="Tuesday" entries={entries}></planner-day>);
     const removed: unknown[] = [];
