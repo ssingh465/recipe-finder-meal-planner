@@ -156,11 +156,12 @@
 	.drawer a {
 		padding: var(--s-3);
 		border-radius: var(--r-sm);
-		border-bottom: none;
+		border-bottom-style: none;
 	}
 
 	.drawer a[aria-current='page'] {
 		background: var(--c-accent-subtle);
+		border-bottom-style: solid;
 	}
 
 	@media (width >= 768px) {

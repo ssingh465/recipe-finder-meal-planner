@@ -220,7 +220,7 @@
 
 	{#snippet notice()}
 		{#if data.result.ok && data.result.truncated}
-			<p class="truncation-notice">
+			<p class="truncation-notice" role="status">
 				Showing the first 100 matches. Narrow your search or filters to see more.
 			</p>
 		{/if}
