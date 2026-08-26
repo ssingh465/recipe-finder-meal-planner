@@ -86,25 +86,19 @@
 }
 
 /* Same procedural hue as <recipe-card>'s image-less tile (utils/tile-hue) —
-   a raw hsl() derived from the name, not a --rc-* token, so it needs the same
-   explicit dark-mode swap <recipe-card> uses rather than the app's --rc-*
-   remapping. */
+   a raw hsl() derived from the name, not a --rc-* token. The saturation and
+   lightness that turn the hue into an actual colour DO come from --rc-*
+   tokens (--rc-tile-bg-s/l, --rc-tile-fg-s/l), so this follows the
+   consumer's theme like every other component instead of the OS. */
 .thumb.tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: hsl(var(--tile-h) 42% 88%);
-  color: hsl(var(--tile-h) 45% 28%);
+  background: hsl(var(--tile-h) var(--rc-tile-bg-s, 42%) var(--rc-tile-bg-l, 88%));
+  color: hsl(var(--tile-h) var(--rc-tile-fg-s, 45%) var(--rc-tile-fg-l, 28%));
   font-family: var(--rc-font-display, Georgia, serif);
   font-size: var(--rc-fs-body, 1rem);
   font-weight: 600;
-}
-
-@media (prefers-color-scheme: dark) {
-  .thumb.tile {
-    background: hsl(var(--tile-h) 30% 22%);
-    color: hsl(var(--tile-h) 35% 82%);
-  }
 }
 
 .name {

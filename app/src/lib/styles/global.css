@@ -63,11 +63,13 @@ body {
 }
 
 /* Reserve space for undefined custom elements so upgrade never causes a
-   layout jump. Height must match each component's real, rendered height
-   exactly — recipe-card is fixed at 22rem. */
+   layout jump. Height must match the component's real, rendered height
+   exactly — recipe-card reads --rc-card-height (falls back to 22rem), so
+   this reservation reads the same variable rather than duplicating the
+   value as a second hardcoded number. */
 recipe-card:not(:defined) {
 	display: block;
-	min-height: 22rem;
+	min-height: var(--rc-card-height, 22rem);
 	visibility: hidden;
 }
 

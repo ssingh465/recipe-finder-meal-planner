@@ -65,9 +65,11 @@ export namespace Components {
         "entries": PlannerEntry[];
     }
     /**
-     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
-     * regardless of content — recipe-card:not(:defined) must reserve the same
-     * value so an unregistered element doesn't cause a layout jump.
+     * The app's primary discovery/favorites/planner unit. Height is fixed
+     * regardless of content, via --rc-card-height (falls back to 22rem) so a
+     * consumer can size it while it stays a single value everywhere it's read —
+     * recipe-card:not(:defined) must reserve the same value so an unregistered
+     * element doesn't cause a layout jump.
      */
     interface RecipeCard {
         /**
@@ -210,9 +212,11 @@ declare global {
         "recipeselect": { recipeId: string };
     }
     /**
-     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
-     * regardless of content — recipe-card:not(:defined) must reserve the same
-     * value so an unregistered element doesn't cause a layout jump.
+     * The app's primary discovery/favorites/planner unit. Height is fixed
+     * regardless of content, via --rc-card-height (falls back to 22rem) so a
+     * consumer can size it while it stays a single value everywhere it's read —
+     * recipe-card:not(:defined) must reserve the same value so an unregistered
+     * element doesn't cause a layout jump.
      */
     interface HTMLRecipeCardElement extends Components.RecipeCard, HTMLStencilElement {
         addEventListener<K extends keyof HTMLRecipeCardElementEventMap>(type: K, listener: (this: HTMLRecipeCardElement, ev: RecipeCardCustomEvent<HTMLRecipeCardElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -323,9 +327,11 @@ declare namespace LocalJSX {
         "onRecipeselect"?: (event: PlannerDayCustomEvent<{ recipeId: string }>) => void;
     }
     /**
-     * The app's primary discovery/favorites/planner unit. Fixed 22rem height
-     * regardless of content — recipe-card:not(:defined) must reserve the same
-     * value so an unregistered element doesn't cause a layout jump.
+     * The app's primary discovery/favorites/planner unit. Height is fixed
+     * regardless of content, via --rc-card-height (falls back to 22rem) so a
+     * consumer can size it while it stays a single value everywhere it's read —
+     * recipe-card:not(:defined) must reserve the same value so an unregistered
+     * element doesn't cause a layout jump.
      */
     interface RecipeCard {
         /**
@@ -434,9 +440,11 @@ declare module "@stencil/core" {
              */
             "planner-day": LocalJSX.IntrinsicElements["planner-day"] & JSXBase.HTMLAttributes<HTMLPlannerDayElement>;
             /**
-             * The app's primary discovery/favorites/planner unit. Fixed 22rem height
-             * regardless of content — recipe-card:not(:defined) must reserve the same
-             * value so an unregistered element doesn't cause a layout jump.
+             * The app's primary discovery/favorites/planner unit. Height is fixed
+             * regardless of content, via --rc-card-height (falls back to 22rem) so a
+             * consumer can size it while it stays a single value everywhere it's read —
+             * recipe-card:not(:defined) must reserve the same value so an unregistered
+             * element doesn't cause a layout jump.
              */
             "recipe-card": LocalJSX.IntrinsicElements["recipe-card"] & JSXBase.HTMLAttributes<HTMLRecipeCardElement>;
             /**

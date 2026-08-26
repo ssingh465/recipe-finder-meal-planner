@@ -1,6 +1,6 @@
 :host {
   display: block;
-  height: 22rem;
+  height: var(--rc-card-height, 22rem);
   font-family: var(--rc-font-text, system-ui, sans-serif);
 }
 
@@ -42,15 +42,8 @@ img.media {
   justify-content: center;
   padding: var(--rc-s-4, 1rem);
   text-align: center;
-  background: hsl(var(--tile-h) 42% 88%);
-  color: hsl(var(--tile-h) 45% 28%);
-}
-
-@media (prefers-color-scheme: dark) {
-  .media.tile {
-    background: hsl(var(--tile-h) 30% 22%);
-    color: hsl(var(--tile-h) 35% 82%);
-  }
+  background: hsl(var(--tile-h) var(--rc-tile-bg-s, 42%) var(--rc-tile-bg-l, 88%));
+  color: hsl(var(--tile-h) var(--rc-tile-fg-s, 45%) var(--rc-tile-fg-l, 28%));
 }
 
 .tile-name {

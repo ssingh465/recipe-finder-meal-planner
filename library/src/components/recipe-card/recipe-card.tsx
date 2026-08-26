@@ -4,9 +4,11 @@ import { tileHue } from '../../utils/tile-hue';
 import { HeartIcon } from '../../utils/icons';
 
 /**
- * The app's primary discovery/favorites/planner unit. Fixed 22rem height
- * regardless of content — recipe-card:not(:defined) must reserve the same
- * value so an unregistered element doesn't cause a layout jump.
+ * The app's primary discovery/favorites/planner unit. Height is fixed
+ * regardless of content, via --rc-card-height (falls back to 22rem) so a
+ * consumer can size it while it stays a single value everywhere it's read —
+ * recipe-card:not(:defined) must reserve the same value so an unregistered
+ * element doesn't cause a layout jump.
  */
 @Component({
   tag: 'recipe-card',
