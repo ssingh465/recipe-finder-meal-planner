@@ -9,9 +9,16 @@
     <script nomodule src="/build/recipe-ui.js"></script>
   </head>
   <body>
-    <spike-panel id="spike"></spike-panel>
+    <recipe-card id="card" href="#" favorited="false"></recipe-card>
     <script type="module">
-      document.getElementById('spike').note = { from: 'index.html', message: 'local dev harness' };
+      document.getElementById('card').recipe = {
+        id: '52772',
+        source: 'api',
+        name: 'Teriyaki Chicken Casserole',
+        thumbnail: null,
+        category: 'Chicken',
+        area: 'Japanese',
+      };
     </script>
   </body>
 </html>

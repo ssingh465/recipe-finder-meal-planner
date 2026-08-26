@@ -6,9 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { DayOfWeek, DayOption, PlannerEntry, RecipeSummary } from "./utils/types";
-import { SpikeNote } from "./components/spike-panel/spike-panel";
 export { DayOfWeek, DayOption, PlannerEntry, RecipeSummary } from "./utils/types";
-export { SpikeNote } from "./components/spike-panel/spike-panel";
 export namespace Components {
     /**
      * Assigns a recipe to a day of the plan. Stateless: occupancy is an input
@@ -101,17 +99,6 @@ export namespace Components {
          */
         "count": number;
     }
-    /**
-     * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
-     * property, custom event, slot) end to end. Not part of the real component
-     * set to come.
-     */
-    interface SpikePanel {
-        /**
-          * Arrives as an object property once the element has upgraded.
-         */
-        "note"?: SpikeNote;
-    }
 }
 export interface DayPickerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -128,10 +115,6 @@ export interface PlannerDayCustomEvent<T> extends CustomEvent<T> {
 export interface RecipeCardCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLRecipeCardElement;
-}
-export interface SpikePanelCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLSpikePanelElement;
 }
 declare global {
     interface HTMLDayPickerElementEventMap {
@@ -267,28 +250,6 @@ declare global {
         prototype: HTMLSkeletonCardElement;
         new (): HTMLSkeletonCardElement;
     };
-    interface HTMLSpikePanelElementEventMap {
-        "spikeaction": SpikeNote;
-    }
-    /**
-     * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
-     * property, custom event, slot) end to end. Not part of the real component
-     * set to come.
-     */
-    interface HTMLSpikePanelElement extends Components.SpikePanel, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLSpikePanelElementEventMap>(type: K, listener: (this: HTMLSpikePanelElement, ev: SpikePanelCustomEvent<HTMLSpikePanelElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLSpikePanelElementEventMap>(type: K, listener: (this: HTMLSpikePanelElement, ev: SpikePanelCustomEvent<HTMLSpikePanelElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLSpikePanelElement: {
-        prototype: HTMLSpikePanelElement;
-        new (): HTMLSpikePanelElement;
-    };
     interface HTMLElementTagNameMap {
         "day-picker": HTMLDayPickerElement;
         "empty-state": HTMLEmptyStateElement;
@@ -297,7 +258,6 @@ declare global {
         "recipe-card": HTMLRecipeCardElement;
         "recipe-grid": HTMLRecipeGridElement;
         "skeleton-card": HTMLSkeletonCardElement;
-        "spike-panel": HTMLSpikePanelElement;
     }
 }
 declare namespace LocalJSX {
@@ -399,21 +359,6 @@ declare namespace LocalJSX {
          */
         "count"?: number;
     }
-    /**
-     * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
-     * property, custom event, slot) end to end. Not part of the real component
-     * set to come.
-     */
-    interface SpikePanel {
-        /**
-          * Arrives as an object property once the element has upgraded.
-         */
-        "note"?: SpikeNote;
-        /**
-          * Lowercase, so it binds as a plain Svelte `on*` attribute.
-         */
-        "onSpikeaction"?: (event: SpikePanelCustomEvent<SpikeNote>) => void;
-    }
 
     interface DayPickerAttributes {
         "recipeId": string;
@@ -451,7 +396,6 @@ declare namespace LocalJSX {
         "recipe-card": Omit<RecipeCard, keyof RecipeCardAttributes> & { [K in keyof RecipeCard & keyof RecipeCardAttributes]?: RecipeCard[K] } & { [K in keyof RecipeCard & keyof RecipeCardAttributes as `attr:${K}`]?: RecipeCardAttributes[K] } & { [K in keyof RecipeCard & keyof RecipeCardAttributes as `prop:${K}`]?: RecipeCard[K] } & OneOf<"href", RecipeCard["href"], RecipeCardAttributes["href"]>;
         "recipe-grid": Omit<RecipeGrid, keyof RecipeGridAttributes> & { [K in keyof RecipeGrid & keyof RecipeGridAttributes]?: RecipeGrid[K] } & { [K in keyof RecipeGrid & keyof RecipeGridAttributes as `attr:${K}`]?: RecipeGridAttributes[K] } & { [K in keyof RecipeGrid & keyof RecipeGridAttributes as `prop:${K}`]?: RecipeGrid[K] };
         "skeleton-card": Omit<SkeletonCard, keyof SkeletonCardAttributes> & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes]?: SkeletonCard[K] } & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes as `attr:${K}`]?: SkeletonCardAttributes[K] } & { [K in keyof SkeletonCard & keyof SkeletonCardAttributes as `prop:${K}`]?: SkeletonCard[K] };
-        "spike-panel": SpikePanel;
     }
 }
 export { LocalJSX as JSX };
@@ -507,12 +451,6 @@ declare module "@stencil/core" {
              * not shift when real cards arrive.
              */
             "skeleton-card": LocalJSX.IntrinsicElements["skeleton-card"] & JSXBase.HTMLAttributes<HTMLSkeletonCardElement>;
-            /**
-             * Integration spike only. Proves the Stencil <-> SvelteKit seam (object
-             * property, custom event, slot) end to end. Not part of the real component
-             * set to come.
-             */
-            "spike-panel": LocalJSX.IntrinsicElements["spike-panel"] & JSXBase.HTMLAttributes<HTMLSpikePanelElement>;
         }
     }
 }
