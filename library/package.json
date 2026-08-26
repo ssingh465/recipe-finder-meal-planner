@@ -1,6 +1,6 @@
 {
   "name": "@ssingh465/recipe-ui",
-  "version": "0.2.3",
+  "version": "1.0.0",
   "description": "Stencil web component library for Recipe Finder & Meal Planner",
   "license": "MIT",
   "repository": {

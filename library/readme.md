@@ -26,9 +26,17 @@ defineCustomElements();
 
 Register once, client-side only, before any consumer renders.
 
-## Status
+## Components
 
-Currently ships a single throwaway component, `<spike-panel>`, that proves the publish →
-install → render → event → slot pipeline end to end. The real component set (`recipe-card`,
-`recipe-grid`, `filter-chip`, `day-picker`, `planner-day`, `empty-state`, `skeleton-card`) is
-still to come.
+| Component | Purpose |
+|---|---|
+| `<recipe-card>` | A single recipe summary — thumbnail or typographic tile, favorite toggle, `actions` slot |
+| `<recipe-grid>` | Responsive card grid layout |
+| `<filter-chip>` | A removable active-filter chip |
+| `<day-picker>` | Assign a recipe to a day of the week |
+| `<planner-day>` | One day's column/section in the weekly planner |
+| `<empty-state>` | Empty/zero-result state with an optional action slot |
+| `<skeleton-card>` | Loading placeholder matching `<recipe-card>`'s dimensions |
+
+Every component reads its theme from `--rc-*` CSS custom properties, each with a built-in
+fallback, so it renders correctly even when the consuming app defines none of them.
