@@ -1,4 +1,4 @@
-import { Component, Prop, State, Event, EventEmitter, Host, h } from '@stencil/core';
+import { Component, Prop, State, Event, EventEmitter, Method, Host, h } from '@stencil/core';
 import type { DayOfWeek, DayOption } from '../../utils/types';
 import { CalendarPlusIcon, CheckIcon } from '../../utils/icons';
 
@@ -10,6 +10,10 @@ import { CalendarPlusIcon, CheckIcon } from '../../utils/icons';
  * in the browser's top layer — the one mechanism that reliably escapes a
  * card's `overflow: hidden` and any transformed ancestor's containing
  * block, which plain `position: fixed` inside a shadow tree does not.
+ *
+ * `open()` lets a host open the panel without a user click on the trigger —
+ * needed when the picker is surfaced in response to some other control (the
+ * planner's `Move` action) rather than being the primary affordance on screen.
  */
 @Component({
   tag: 'day-picker',
@@ -24,8 +28,14 @@ export class DayPicker {
   @Event() planassign: EventEmitter<{ recipeId: string; day: DayOfWeek }>;
   @Event() pickerclose: EventEmitter<Record<string, never>>;
 
-  @State() open = false;
+  @State() isOpen = false;
   @State() activeIndex = 0;
+
+  /** Opens the panel programmatically, exactly as a trigger click would. */
+  @Method()
+  async open(): Promise<void> {
+    this.openPanel();
+  }
 
   private triggerEl?: HTMLButtonElement;
   private panelEl?: HTMLElement;
@@ -56,7 +66,7 @@ export class DayPicker {
   }
 
   private openPanel = () => {
-    this.open = true;
+    this.isOpen = true;
     this.activeIndex = 0;
     requestAnimationFrame(() => {
       this.panelEl?.showPopover?.();
@@ -69,8 +79,8 @@ export class DayPicker {
   };
 
   private closePanel = (returnFocus: boolean) => {
-    if (!this.open) return;
-    this.open = false;
+    if (!this.isOpen) return;
+    this.isOpen = false;
     this.panelEl?.hidePopover?.();
     window.removeEventListener('resize', this.reposition);
     window.removeEventListener('scroll', this.reposition, true);
@@ -130,7 +140,7 @@ export class DayPicker {
   };
 
   render() {
-    const { open, activeIndex } = this;
+    const { isOpen, activeIndex } = this;
     const days = this.safeDays;
     return (
       <Host>
@@ -140,8 +150,8 @@ export class DayPicker {
           class="trigger"
           ref={(el) => (this.triggerEl = el)}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : 'false'}
-          onClick={() => (this.open ? this.closePanel(true) : this.openPanel())}
+          aria-expanded={isOpen ? 'true' : 'false'}
+          onClick={() => (this.isOpen ? this.closePanel(true) : this.openPanel())}
         >
           {CalendarPlusIcon()}
           <span>{this.label}</span>

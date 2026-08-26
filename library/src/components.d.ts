@@ -17,10 +17,17 @@ export namespace Components {
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
      * block, which plain `position: fixed` inside a shadow tree does not.
+     * `open()` lets a host open the panel without a user click on the trigger —
+     * needed when the picker is surfaced in response to some other control (the
+     * planner's `Move` action) rather than being the primary affordance on screen.
      */
     interface DayPicker {
         "days": DayOption[];
         "label": string;
+        /**
+          * Opens the panel programmatically, exactly as a trigger click would.
+         */
+        "open": () => Promise<void>;
         "recipeId": string;
     }
     /**
@@ -138,6 +145,9 @@ declare global {
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
      * block, which plain `position: fixed` inside a shadow tree does not.
+     * `open()` lets a host open the panel without a user click on the trigger —
+     * needed when the picker is surfaced in response to some other control (the
+     * planner's `Move` action) rather than being the primary affordance on screen.
      */
     interface HTMLDayPickerElement extends Components.DayPicker, HTMLStencilElement {
         addEventListener<K extends keyof HTMLDayPickerElementEventMap>(type: K, listener: (this: HTMLDayPickerElement, ev: DayPickerCustomEvent<HTMLDayPickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -189,6 +199,7 @@ declare global {
         "entryremove": { recipeId: string; day: DayOfWeek };
         "entrymoverequest": { recipeId: string; fromDay: DayOfWeek };
         "daytoggle": { day: DayOfWeek; collapsed: boolean };
+        "recipeselect": { recipeId: string };
     }
     /**
      * One day's column/section in the planner. Owns its complete accessible
@@ -299,6 +310,9 @@ declare namespace LocalJSX {
      * in the browser's top layer — the one mechanism that reliably escapes a
      * card's `overflow: hidden` and any transformed ancestor's containing
      * block, which plain `position: fixed` inside a shadow tree does not.
+     * `open()` lets a host open the panel without a user click on the trigger —
+     * needed when the picker is surfaced in response to some other control (the
+     * planner's `Move` action) rather than being the primary affordance on screen.
      */
     interface DayPicker {
         "days": DayOption[];
@@ -346,6 +360,7 @@ declare namespace LocalJSX {
         "onDaytoggle"?: (event: PlannerDayCustomEvent<{ day: DayOfWeek; collapsed: boolean }>) => void;
         "onEntrymoverequest"?: (event: PlannerDayCustomEvent<{ recipeId: string; fromDay: DayOfWeek }>) => void;
         "onEntryremove"?: (event: PlannerDayCustomEvent<{ recipeId: string; day: DayOfWeek }>) => void;
+        "onRecipeselect"?: (event: PlannerDayCustomEvent<{ recipeId: string }>) => void;
     }
     /**
      * The app's primary discovery/favorites/planner unit. Fixed 22rem height
@@ -450,6 +465,9 @@ declare module "@stencil/core" {
              * in the browser's top layer — the one mechanism that reliably escapes a
              * card's `overflow: hidden` and any transformed ancestor's containing
              * block, which plain `position: fixed` inside a shadow tree does not.
+             * `open()` lets a host open the panel without a user click on the trigger —
+             * needed when the picker is surfaced in response to some other control (the
+             * planner's `Move` action) rather than being the primary affordance on screen.
              */
             "day-picker": LocalJSX.IntrinsicElements["day-picker"] & JSXBase.HTMLAttributes<HTMLDayPickerElement>;
             /**

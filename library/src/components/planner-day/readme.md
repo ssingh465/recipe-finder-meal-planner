@@ -31,6 +31,7 @@ week, so there is nothing to derive "today" from.
 | `daytoggle`        |             | `CustomEvent<{ day: DayOfWeek; collapsed: boolean; }>`   |
 | `entrymoverequest` |             | `CustomEvent<{ recipeId: string; fromDay: DayOfWeek; }>` |
 | `entryremove`      |             | `CustomEvent<{ recipeId: string; day: DayOfWeek; }>`     |
+| `recipeselect`     |             | `CustomEvent<{ recipeId: string; }>`                     |
 
 
 ## Slots
