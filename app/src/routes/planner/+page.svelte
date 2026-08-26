@@ -17,7 +17,8 @@
 	// Keyed by recipe id, shared across every day that plans it — a recipe
 	// planned on three days resolves once, not three times. Populated
 	// progressively: each id's own lookup updates this the moment it settles,
-	// independently of every other id (per-row loading, per 8.11).
+	// independently of every other id, so one slow or failed lookup never
+	// blocks the rest.
 	let resolvedCache = $state<Record<string, ResolvedRecipe>>({});
 
 	$effect(() => {
@@ -38,21 +39,41 @@
 		return () => controller.abort();
 	});
 
-	function entriesFor(day: DayOfWeek): PlannerEntry[] {
-		return plan.day(day).map((id): PlannerEntry => {
-			const cached = resolvedCache[id];
-			if (!cached) return { recipeId: id, name: 'Loading…', thumbnail: null, resolved: false };
-			if (cached.recipe) {
-				return {
-					recipeId: id,
-					name: cached.recipe.name,
-					thumbnail: cached.recipe.thumbnail,
-					resolved: true
-				};
-			}
-			return { recipeId: id, name: "Couldn't load this recipe", thumbnail: null, resolved: false };
-		});
-	}
+	// An id with no cache entry yet simply isn't included, rather than shown
+	// with an invented "loading" placeholder — the row appears the moment its
+	// own lookup settles, independently of every other entry.
+	//
+	// $derived, not a plain function called from the template: entries must be
+	// the SAME array reference across a re-render unrelated to plan/resolvedCache
+	// (e.g. toggling movingEntry for the move bar), or Stencil sees a new prop
+	// value and tears down and rebuilds every <li>, taking focus with it — which
+	// broke the Move button's focus-return-on-dismiss.
+	const entriesByDay = $derived.by(() => {
+		const byDay = {} as Record<DayOfWeek, PlannerEntry[]>;
+		for (const day of DAYS) {
+			byDay[day] = plan
+				.day(day)
+				.map((id) => resolvedCache[id])
+				.filter((cached): cached is ResolvedRecipe => cached !== undefined)
+				.map((cached): PlannerEntry => {
+					if (cached.recipe) {
+						return {
+							recipeId: cached.id,
+							name: cached.recipe.name,
+							thumbnail: cached.recipe.thumbnail,
+							resolved: true
+						};
+					}
+					return {
+						recipeId: cached.id,
+						name: "Couldn't load this recipe",
+						thumbnail: null,
+						resolved: false
+					};
+				});
+		}
+		return byDay;
+	});
 
 	const weekIsEmpty = $derived(DAYS.every((day) => plan.day(day).length === 0));
 
@@ -78,7 +99,12 @@
 	// Move spans two days, which <planner-day> cannot know — it emits only
 	// what it knows (recipeId, fromDay), and the app orchestrates the rest:
 	// surface a <day-picker> for that recipe, then call the atomic plan.move().
-	let movingEntry = $state<{ recipeId: string; fromDay: DayOfWeek; name: string } | null>(null);
+	let movingEntry = $state<{
+		recipeId: string;
+		fromDay: DayOfWeek;
+		name: string;
+		returnFocusTo: HTMLElement | null;
+	} | null>(null);
 	let dayPickerEl = $state<HTMLDayPickerElement>();
 
 	$effect(() => {
@@ -88,11 +114,31 @@
 		}
 	});
 
-	function handleMoveRequest(recipeId: string, fromDay: DayOfWeek) {
-		movingEntry = { recipeId, fromDay, name: nameFor(recipeId) };
+	function handleMoveRequest(recipeId: string, fromDay: DayOfWeek, dayEl: HTMLElement) {
+		const name = nameFor(recipeId);
+		// So focus can return to the control that opened this on dismissal —
+		// the event only gives us the <planner-day> host, so its own Move
+		// button for this entry is found the same way it's labelled internally.
+		const returnFocusTo =
+			dayEl.shadowRoot?.querySelector<HTMLElement>(`[aria-label="Move ${name}"]`) ?? null;
+		movingEntry = { recipeId, fromDay, name, returnFocusTo };
 	}
 
-	function moveDayOptions(recipeId: string, fromDay: DayOfWeek): DayOption[] {
+	function closeMoveBar() {
+		movingEntry?.returnFocusTo?.focus();
+		movingEntry = null;
+	}
+
+	// $derived for the same reason as entriesByDay: a fresh array on every
+	// unrelated re-render would make day-picker tear down and rebuild its day
+	// buttons — losing focus mid-interaction if it happens while the picker
+	// is open (e.g. an unrelated id resolving elsewhere while the user is
+	// still arrow-keying through days).
+	const moveDayOptions = $derived(
+		movingEntry ? buildMoveDayOptions(movingEntry.recipeId, movingEntry.fromDay) : []
+	);
+
+	function buildMoveDayOptions(recipeId: string, fromDay: DayOfWeek): DayOption[] {
 		const occupied = new Set(plan.daysContaining(recipeId));
 		return DAYS.map((day) => ({
 			day,
@@ -101,6 +147,9 @@
 		}));
 	}
 
+	// day-picker always follows planassign with pickerclose (closePanel runs
+	// right after the emit in its own selectDay handler) — closeMoveBar there
+	// is what actually clears movingEntry, for both this and the cancel path.
 	function handleMoveAssign(event: DayPickerCustomEvent<{ recipeId: string; day: DayOfWeek }>) {
 		if (!movingEntry) return;
 		const { recipeId, fromDay, name } = movingEntry;
@@ -108,7 +157,6 @@
 		if (plan.move(recipeId, fromDay, day)) {
 			addToast(`Moved ${name} to ${DAY_LABELS[day]}.`);
 		}
-		movingEntry = null;
 	}
 </script>
 
@@ -140,13 +188,18 @@
 				<planner-day
 					{day}
 					dayLabel={DAY_LABELS[day]}
-					entries={entriesFor(day)}
+					entries={entriesByDay[day]}
 					collapsed={isCollapsed(day)}
 					onentryremove={(event: PlannerDayCustomEvent<{ recipeId: string; day: DayOfWeek }>) =>
 						handleEntryRemove(event.detail.recipeId, event.detail.day)}
 					onentrymoverequest={(
 						event: PlannerDayCustomEvent<{ recipeId: string; fromDay: DayOfWeek }>
-					) => handleMoveRequest(event.detail.recipeId, event.detail.fromDay)}
+					) =>
+						handleMoveRequest(
+							event.detail.recipeId,
+							event.detail.fromDay,
+							event.currentTarget as HTMLElement
+						)}
 					ondaytoggle={(event: PlannerDayCustomEvent<{ day: DayOfWeek; collapsed: boolean }>) =>
 						(collapsedOverride = { ...collapsedOverride, [event.detail.day]: event.detail.collapsed })}
 					onrecipeselect={(event: PlannerDayCustomEvent<{ recipeId: string }>) =>
@@ -165,12 +218,12 @@
 		<day-picker
 			bind:this={dayPickerEl}
 			recipeId={movingEntry.recipeId}
-			days={moveDayOptions(movingEntry.recipeId, movingEntry.fromDay)}
+			days={moveDayOptions}
 			label="Choose a day"
 			onplanassign={handleMoveAssign}
-			onpickerclose={() => (movingEntry = null)}
+			onpickerclose={closeMoveBar}
 		></day-picker>
-		<Button variant="secondary" size="sm" onclick={() => (movingEntry = null)}>Cancel</Button>
+		<Button variant="secondary" size="sm" onclick={closeMoveBar}>Cancel</Button>
 	</div>
 {/if}
 
@@ -219,6 +272,7 @@
 		from {
 			transform: translateX(-100%);
 		}
+
 		to {
 			transform: translateX(100%);
 		}
