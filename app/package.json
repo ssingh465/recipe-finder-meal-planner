@@ -39,6 +39,6 @@
 		"vitest": "^4.1.8"
 	},
 	"dependencies": {
-		"@ssingh465/recipe-ui": "^0.2.2"
+		"@ssingh465/recipe-ui": "^0.2.3"
 	}
 }
