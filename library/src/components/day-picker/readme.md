@@ -15,6 +15,10 @@ in the browser's top layer — the one mechanism that reliably escapes a
 card's `overflow: hidden` and any transformed ancestor's containing
 block, which plain `position: fixed` inside a shadow tree does not.
 
+`open()` lets a host open the panel without a user click on the trigger —
+needed when the picker is surfaced in response to some other control (the
+planner's `Move` action) rather than being the primary affordance on screen.
+
 ## Properties
 
 | Property                | Attribute   | Description | Type          | Default     |
@@ -30,6 +34,19 @@ block, which plain `position: fixed` inside a shadow tree does not.
 | ------------- | ----------- | ---------------------------------------------------- |
 | `pickerclose` |             | `CustomEvent<never \| string>`                       |
 | `planassign`  |             | `CustomEvent<{ recipeId: string; day: DayOfWeek; }>` |
+
+
+## Methods
+
+### `open() => Promise<void>`
+
+Opens the panel programmatically, exactly as a trigger click would.
+
+#### Returns
+
+Type: `Promise<void>`
+
+
 
 
 ## Shadow Parts

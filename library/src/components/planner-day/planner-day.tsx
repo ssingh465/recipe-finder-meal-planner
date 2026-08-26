@@ -24,6 +24,7 @@ export class PlannerDay {
   @Event() entryremove: EventEmitter<{ recipeId: string; day: DayOfWeek }>;
   @Event() entrymoverequest: EventEmitter<{ recipeId: string; fromDay: DayOfWeek }>;
   @Event() daytoggle: EventEmitter<{ day: DayOfWeek; collapsed: boolean }>;
+  @Event() recipeselect: EventEmitter<{ recipeId: string }>;
 
   private handleToggle = () => {
     this.daytoggle.emit({ day: this.day, collapsed: !this.collapsed });
@@ -37,7 +38,13 @@ export class PlannerDay {
         ) : (
           <span class="thumb placeholder" aria-hidden="true"></span>
         )}
-        <span class="name">{entry.name}</span>
+        <button
+          type="button"
+          class="name"
+          onClick={() => this.recipeselect.emit({ recipeId: entry.recipeId })}
+        >
+          {entry.name}
+        </button>
         <div class="row-actions">
           <button
             type="button"

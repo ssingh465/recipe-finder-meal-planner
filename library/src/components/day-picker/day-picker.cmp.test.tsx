@@ -61,6 +61,15 @@ describe('day-picker', () => {
     expect(root.shadowRoot?.querySelectorAll('.day').length).toBe(0);
   });
 
+  it('opens the panel via the open() method, without a trigger click', async () => {
+    const { root, waitForChanges } = await render<HTMLDayPickerElement>(
+      <day-picker recipeId="52772" days={days} label="Add to plan"></day-picker>,
+    );
+    await root.open();
+    await waitForChanges();
+    expect(root.shadowRoot?.querySelector('.trigger')?.getAttribute('aria-expanded')).toBe('true');
+  });
+
   it('does not assign when an occupied day is clicked', async () => {
     const { root, waitForChanges } = await render(
       <day-picker recipeId="52772" days={days} label="Add to plan"></day-picker>,

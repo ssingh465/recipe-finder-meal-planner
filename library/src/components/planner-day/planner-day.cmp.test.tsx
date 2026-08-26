@@ -29,6 +29,15 @@ describe('planner-day', () => {
     expect(removed).toEqual([{ recipeId: '52772', day: 'tue' }]);
   });
 
+  it('emits recipeselect with the recipeId when the entry name is activated', async () => {
+    const { root, waitForChanges } = await render(<planner-day day="mon" dayLabel="Monday" entries={entries}></planner-day>);
+    const selected: unknown[] = [];
+    root.addEventListener('recipeselect', (event: Event) => selected.push((event as CustomEvent).detail));
+    root.shadowRoot?.querySelectorAll<HTMLButtonElement>('.entry .name')[0].click();
+    await waitForChanges();
+    expect(selected).toEqual([{ recipeId: '52772' }]);
+  });
+
   it('emits entrymoverequest with only fromDay, never a target day', async () => {
     const { root, waitForChanges } = await render(<planner-day day="wed" dayLabel="Wednesday" entries={entries}></planner-day>);
     const moves: unknown[] = [];

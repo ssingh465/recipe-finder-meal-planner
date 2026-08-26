@@ -92,10 +92,27 @@
 .name {
   flex: 1;
   min-width: 0;
+  font-family: inherit;
   font-size: var(--rc-fs-sm, 0.875rem);
+  color: inherit;
+  background: transparent;
+  border: none;
+  padding: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: start;
+  cursor: pointer;
+}
+
+.name:hover {
+  text-decoration: underline;
+}
+
+.name:focus-visible {
+  outline: none;
+  box-shadow: var(--rc-focus-ring, 0 0 0 2px #fff, 0 0 0 4px #2a2420);
+  border-radius: var(--rc-radius-sm, 6px);
 }
 
 .row-actions {
