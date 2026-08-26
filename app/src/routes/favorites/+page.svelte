@@ -71,7 +71,7 @@
 <ScaffoldIndex title="Favorites">
 	{#snippet notice()}
 		{#if failedEntries.length > 0}
-			<div class="partial-failure">
+			<div class="partial-failure" role="status">
 				<p>Some favorites couldn't be loaded.</p>
 				<Button variant="secondary" size="sm" onclick={retryFailed}>Retry</Button>
 			</div>

@@ -7,7 +7,8 @@
 		"node": ">=20"
 	},
 	"scripts": {
-		"prebuild": "tsx scripts/derive-filter-options.ts",
+		"prebuild": "tsx scripts/derive-filter-options.ts && tsx scripts/check-contrast.ts",
+		"check:contrast": "tsx scripts/check-contrast.ts",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
