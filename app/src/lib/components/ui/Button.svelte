@@ -28,6 +28,23 @@
 		cursor: pointer;
 		border: 1px solid transparent;
 		padding-inline: var(--s-4);
+		transition:
+			background var(--dur-base) var(--ease),
+			border-color var(--dur-base) var(--ease),
+			box-shadow var(--dur-base) var(--ease),
+			transform var(--dur-instant) var(--ease-spring-soft);
+	}
+
+	/* Press feedback is a desktop/mouse affordance: `transform: scale()` is
+	   included in the box getBoundingClientRect reports, so shrinking a touch
+	   target on press — even briefly — is the kind of thing that fails the
+	   44px-minimum rule on a technicality. Gating on (hover: hover) restricts
+	   it to pointers where that's not a concern; touch feedback comes from the
+	   background/border transition above instead. */
+	@media (hover: hover) and (pointer: fine) {
+		.btn:active:not(:disabled) {
+			transform: scale(0.97);
+		}
 	}
 
 	.btn:disabled {
@@ -58,8 +75,16 @@
 		color: var(--c-on-accent);
 	}
 
+	/* Only the primary (CTA) variant gets the glow-reinforced ring — glow
+	   is decoration on top of the same hard-edged double ring every other
+	   control uses, never a replacement for it. */
+	.primary:focus-visible {
+		box-shadow: var(--focus-ring-glow);
+	}
+
 	.primary:hover:not(:disabled) {
 		background: var(--c-accent-hover);
+		box-shadow: var(--sh-glow-accent);
 	}
 
 	.secondary {

@@ -178,9 +178,9 @@
 		{#if !plan.hydrated}
 			{#each DAYS as day (day)}
 				<div class="day-skeleton" aria-hidden="true">
-					<div class="skeleton-line title"></div>
-					<div class="skeleton-line"></div>
-					<div class="skeleton-line"></div>
+					<div class="skeleton-line skeleton-shimmer title"></div>
+					<div class="skeleton-line skeleton-shimmer"></div>
+					<div class="skeleton-line skeleton-shimmer"></div>
 				</div>
 			{/each}
 		{:else}
@@ -243,39 +243,16 @@
 		height: 1rem;
 		border-radius: var(--r-sm);
 		background: var(--c-border);
-		position: relative;
-		overflow: hidden;
+
+		/* This block sits inside the --c-surface-sunken card above, so the
+		   shared .skeleton-shimmer sweep (default --c-border) would be nearly
+		   invisible against a --c-border line — override it. */
+		--skeleton-sweep: var(--c-surface-sunken);
 	}
 
 	.skeleton-line.title {
 		width: 60%;
 		height: 1.25rem;
-	}
-
-	.skeleton-line::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(90deg, transparent, var(--c-surface) 50%, transparent);
-		opacity: 0.4;
-		animation: shimmer 1.4s infinite;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.skeleton-line::after {
-			animation: none;
-			opacity: 0.2;
-		}
-	}
-
-	@keyframes shimmer {
-		from {
-			transform: translateX(-100%);
-		}
-
-		to {
-			transform: translateX(100%);
-		}
 	}
 
 	.move-bar {

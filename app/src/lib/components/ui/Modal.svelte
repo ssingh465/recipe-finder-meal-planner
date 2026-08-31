@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { fade, scale } from 'svelte/transition';
+	import { backOut, cubicIn } from 'svelte/easing';
+	import { reducedMotion } from '$lib/utils/reducedMotion.svelte';
 
 	interface Props {
 		open: boolean;
@@ -52,7 +55,12 @@
 </script>
 
 {#if open}
-	<div class="backdrop" onclick={onclose} role="presentation">
+	<div
+		class="backdrop"
+		onclick={onclose}
+		role="presentation"
+		transition:fade={{ duration: reducedMotion.current ? 0 : 180 }}
+	>
 		<div
 			bind:this={dialog}
 			class="dialog"
@@ -62,6 +70,8 @@
 			tabindex="-1"
 			onkeydown={handleKeydown}
 			onclick={(event) => event.stopPropagation()}
+			in:scale={{ start: 0.98, duration: reducedMotion.current ? 0 : 240, easing: backOut }}
+			out:scale={{ start: 0.98, duration: reducedMotion.current ? 0 : 140, easing: cubicIn }}
 		>
 			<h2 id="modal-heading">{heading}</h2>
 			<div class="body">
@@ -102,7 +112,6 @@
 		border-radius: var(--r-lg);
 		box-shadow: var(--sh-3);
 		padding: var(--s-5);
-		animation: modal-in var(--dur-modal) var(--ease);
 	}
 
 	.dialog h2 {
@@ -120,18 +129,6 @@
 	@media (width <= 767px) {
 		.actions {
 			flex-direction: column-reverse;
-		}
-	}
-
-	@keyframes modal-in {
-		from {
-			opacity: 0;
-			transform: scale(0.98);
-		}
-
-		to {
-			opacity: 1;
-			transform: scale(1);
 		}
 	}
 </style>

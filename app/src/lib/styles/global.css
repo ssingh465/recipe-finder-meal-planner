@@ -73,3 +73,61 @@ recipe-card:not(:defined) {
 	visibility: hidden;
 }
 
+/* Route transition, driven by the View Transitions API via onNavigate in
+   +layout.svelte — that code already skips this entirely for a same-route
+   navigation (a filter/pagination change on `/`, which only ever swaps
+   content, never the page shell) and for prefers-reduced-motion. This CSS
+   is the belt to that JS suspenders: browsers that DO run a transition get
+   a cross-fade on our own timing instead of the (longer) UA default, and
+   reduced-motion gets a second, independent guard here in case JS is slow
+   to attach. */
+:root::view-transition-old(root),
+:root::view-transition-new(root) {
+	animation-duration: var(--dur-slow);
+	animation-timing-function: var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root::view-transition-old(root),
+	:root::view-transition-new(root) {
+		animation: none;
+	}
+}
+
+/* Shared skeleton shimmer sweep — was duplicated near-identically across three
+   route files (planner, recipe detail, recipe edit), each with its own
+   ::after rule, @keyframes and reduced-motion override. Apply this class
+   alongside a page's own sizing class (its own background/radius/dimensions
+   stay page-local — only the sweep itself was actual duplication). The
+   reduced-motion block at the top of this file already forces every
+   ::after's animation-duration to 0.01ms — including this one — so no
+   separate override is needed here. */
+.skeleton-shimmer {
+	position: relative;
+	overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+
+	/* --skeleton-sweep lets a caller override the highlight colour when its
+	   skeleton block sits on a background other than the page's own --c-bg
+	   (the planner's skeleton lines sit inside a --c-surface-sunken card, so
+	   a --c-border sweep there would be nearly invisible). */
+	background: linear-gradient(90deg, transparent, var(--skeleton-sweep, var(--c-border)) 50%, transparent);
+	opacity: 0.3;
+	animation: skeleton-shimmer-sweep var(--dur-shimmer) infinite;
+}
+
+@keyframes skeleton-shimmer-sweep {
+	from {
+		transform: translateX(-100%);
+	}
+
+	to {
+		transform: translateX(100%);
+	}
+}
+

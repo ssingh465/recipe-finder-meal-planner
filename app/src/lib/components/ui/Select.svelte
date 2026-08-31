@@ -47,9 +47,14 @@
 		font-family: var(--font-text);
 		font-size: var(--fs-body);
 		color: var(--c-text);
+		transition: border-color var(--dur-base) var(--ease);
 	}
 
 	select:focus-visible {
 		border-color: var(--c-accent);
+	}
+
+	select:hover:not(:focus-visible, :disabled) {
+		border-color: var(--c-border-strong);
 	}
 </style>

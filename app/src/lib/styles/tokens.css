@@ -177,10 +177,29 @@
 	--sh-glow-error: 0 2px 18px -2px var(--cx-glow-error);
 
 	/* Motion */
+	--dur-instant: 80ms;
 	--dur-micro: 120ms;
 	--dur-base: 180ms;
 	--dur-modal: 240ms;
+	--dur-slow: 320ms;
 	--ease: cubic-bezier(0.2, 0, 0.2, 1);
+	--ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+	/* Overshoot curves for tactile feedback — a control settles slightly past
+	   its resting state before easing back. Reserved for entrances/presses on
+	   elements the user just acted on directly; never for passive/ambient
+	   motion (skeleton shimmer, hero mesh), which stays on --ease. */
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--ease-spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
+
+	/* Per-item delay increment for a staggered list entrance. Multiply by
+	   index, and always cap the total span (e.g. min(index, 8) * --stagger-step)
+	   so a long list's stagger never delays what's visible above the fold. */
+	--stagger-step: 30ms;
+
+	/* The skeleton shimmer sweep — an ambient loop, not an interactive
+	   transition, so it stays a separate token from the --dur-* scale above. */
+	--dur-shimmer: 1.4s;
 
 	/* z-index scale. Use these names, never a bare number. */
 	--z-header: 100;

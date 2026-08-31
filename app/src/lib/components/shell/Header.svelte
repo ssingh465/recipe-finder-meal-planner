@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { slide } from 'svelte/transition';
 	import { page } from '$app/state';
+	import { reducedMotion } from '$lib/utils/reducedMotion.svelte';
 	import ThemeToggle from './ThemeToggle.svelte';
 
 	const NAV_LINKS = [
@@ -65,7 +67,11 @@
 	</div>
 
 	{#if drawerOpen}
-		<nav class="drawer" aria-label="Main">
+		<nav
+			class="drawer"
+			aria-label="Main"
+			transition:slide={{ duration: reducedMotion.current ? 0 : 220 }}
+		>
 			{#each NAV_LINKS as link (link.href)}
 				<a
 					href={link.href}
@@ -84,8 +90,41 @@
 		position: sticky;
 		top: 0;
 		z-index: var(--z-header);
+
+		/* Flat fallback first: a browser that can't parse color-mix() treats
+		   the second declaration below as invalid and keeps this one. A
+		   browser that supports color-mix() but not backdrop-filter still
+		   ends up opaque, because --gl-alpha is raised to 100% in tokens.css
+		   for that case, which makes --cx-glass itself resolve fully opaque. */
+		/* stylelint-disable declaration-block-no-duplicate-properties -- intentional progressive-enhancement fallback */
 		background: var(--c-surface);
+		background: var(--cx-glass);
+		/* stylelint-enable declaration-block-no-duplicate-properties */
+		backdrop-filter: blur(var(--gl-blur)) saturate(var(--gl-saturate));
 		border-bottom: 1px solid var(--c-border);
+	}
+
+	/* A soft shadow that grows in as the page scrolls under the sticky header —
+	   driven entirely by scroll position (not autoplaying), so this needs no
+	   reduced-motion guard. box-shadow never affects layout, so this can't
+	   introduce CLS. @supports keeps unsupported browsers at their flat
+	   border-only look, never a broken/half-applied state. */
+	@supports (animation-timeline: scroll()) {
+		.header {
+			animation: header-elevate linear both;
+			animation-timeline: scroll(root);
+			animation-range: 0 40px;
+		}
+	}
+
+	@keyframes header-elevate {
+		from {
+			box-shadow: none;
+		}
+
+		to {
+			box-shadow: var(--sh-2);
+		}
 	}
 
 	.bar {

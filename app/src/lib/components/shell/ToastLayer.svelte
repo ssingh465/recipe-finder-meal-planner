@@ -1,10 +1,17 @@
 <script lang="ts">
+	import { fly } from 'svelte/transition';
+	import { backOut, cubicIn } from 'svelte/easing';
 	import { toasts, dismissToast } from '$lib/stores/toast.svelte';
+	import { reducedMotion } from '$lib/utils/reducedMotion.svelte';
 </script>
 
 <div class="toast-layer" role="status" aria-live="polite">
 	{#each toasts as toast (toast.id)}
-		<div class="toast">
+		<div
+			class="toast"
+			in:fly={{ y: 8, duration: reducedMotion.current ? 0 : 220, easing: backOut }}
+			out:fly={{ y: 8, duration: reducedMotion.current ? 0 : 140, easing: cubicIn }}
+		>
 			<p>{toast.message}</p>
 			<button type="button" aria-label="Dismiss" onclick={() => dismissToast(toast.id)}>
 				<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
@@ -46,7 +53,6 @@
 		display: flex;
 		align-items: center;
 		gap: var(--s-3);
-		animation: toast-in var(--dur-base) var(--ease);
 	}
 
 	.toast p {
@@ -67,17 +73,5 @@
 		color: var(--c-text-muted);
 		cursor: pointer;
 		border-radius: var(--r-sm);
-	}
-
-	@keyframes toast-in {
-		from {
-			opacity: 0;
-			transform: translateY(8px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 </style>

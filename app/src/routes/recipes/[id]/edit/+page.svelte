@@ -35,10 +35,10 @@
 {#if viewState === 'loading'}
 	<div class="form-skeleton">
 		<span class="visually-hidden" role="status">Loading recipe…</span>
-		<div class="skel skel-title" aria-hidden="true"></div>
-		<div class="skel skel-line" aria-hidden="true"></div>
-		<div class="skel skel-line" aria-hidden="true"></div>
-		<div class="skel skel-line short" aria-hidden="true"></div>
+		<div class="skel skeleton-shimmer skel-title" aria-hidden="true"></div>
+		<div class="skel skeleton-shimmer skel-line" aria-hidden="true"></div>
+		<div class="skel skeleton-shimmer skel-line" aria-hidden="true"></div>
+		<div class="skel skeleton-shimmer skel-line short" aria-hidden="true"></div>
 	</div>
 {:else if viewState === 'notfound'}
 	<ScaffoldMessage heading="Recipe not found" body="This recipe may have been deleted.">
@@ -76,27 +76,6 @@
 	.skel {
 		background: var(--c-surface-sunken);
 		border-radius: var(--r-md);
-		position: relative;
-		overflow: hidden;
-	}
-
-	.skel::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(90deg, transparent, var(--c-border) 50%, transparent);
-		opacity: 0.3;
-		animation: skeleton-shimmer 1.4s infinite;
-	}
-
-	@keyframes skeleton-shimmer {
-		from {
-			transform: translateX(-100%);
-		}
-
-		to {
-			transform: translateX(100%);
-		}
 	}
 
 	.skel-title {

@@ -50,10 +50,15 @@
 		font-size: var(--fs-body);
 		color: var(--c-text);
 		resize: vertical;
+		transition: border-color var(--dur-base) var(--ease);
 	}
 
 	textarea:focus-visible {
 		border-color: var(--c-accent);
+	}
+
+	textarea:hover:not(:focus-visible, :disabled) {
+		border-color: var(--c-border-strong);
 	}
 
 	textarea.invalid {
