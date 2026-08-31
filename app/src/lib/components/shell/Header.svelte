@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import ThemeToggle from './ThemeToggle.svelte';
 
 	const NAV_LINKS = [
 		{ label: 'Discover', href: '/' },
@@ -40,23 +41,27 @@
 			{/each}
 		</nav>
 
-		<button
-			bind:this={hamburger}
-			class="hamburger"
-			type="button"
-			aria-expanded={drawerOpen}
-			aria-label="Menu"
-			onclick={() => (drawerOpen = !drawerOpen)}
-		>
-			<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-				<path
-					d="M4 6h16M4 12h16M4 18h16"
-					stroke="currentColor"
-					stroke-width="1.75"
-					stroke-linecap="round"
-				/>
-			</svg>
-		</button>
+		<div class="controls">
+			<ThemeToggle />
+
+			<button
+				bind:this={hamburger}
+				class="hamburger"
+				type="button"
+				aria-expanded={drawerOpen}
+				aria-label="Menu"
+				onclick={() => (drawerOpen = !drawerOpen)}
+			>
+				<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+					<path
+						d="M4 6h16M4 12h16M4 18h16"
+						stroke="currentColor"
+						stroke-width="1.75"
+						stroke-linecap="round"
+					/>
+				</svg>
+			</button>
+		</div>
 	</div>
 
 	{#if drawerOpen}
@@ -130,6 +135,12 @@
 		color: var(--c-text);
 		font-weight: 700;
 		border-bottom-color: var(--c-accent);
+	}
+
+	.controls {
+		display: flex;
+		align-items: center;
+		gap: var(--s-3);
 	}
 
 	.hamburger {

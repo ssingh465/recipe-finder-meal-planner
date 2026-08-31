@@ -7,15 +7,17 @@
 	import { favorites } from '$lib/stores/favorites.svelte';
 	import { plan } from '$lib/stores/planner.svelte';
 	import { recipes } from '$lib/stores/recipes.svelte';
+	import { theme } from '$lib/stores/theme.svelte';
 
 	let { children } = $props();
 
 	// $effect never runs during SSR, so this is the client-only hydration point for
-	// all three stores — every route below can read them without racing storage.
+	// all four stores — every route below can read them without racing storage.
 	$effect(() => {
 		favorites.hydrate();
 		plan.hydrate();
 		recipes.hydrate();
+		theme.hydrate();
 	});
 </script>
 

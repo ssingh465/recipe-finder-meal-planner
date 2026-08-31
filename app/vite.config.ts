@@ -26,6 +26,12 @@ export default defineConfig({
 			csp: {
 				directives: {
 					'default-src': ['self'],
+					// Inline scripts are nonce-gated, never 'unsafe-inline' — SvelteKit
+					// generates the nonce and injects it both into this header and into
+					// %sveltekit.nonce% in app.html's boot script. Stated explicitly here
+					// rather than left to default-src's fallback, so the intent is legible
+					// at the config site instead of inferred.
+					'script-src': ['self'],
 					'img-src': ['self', 'https://www.themealdb.com', 'data:'],
 					'connect-src': ['self', 'https://www.themealdb.com'],
 					'style-src': ['self', 'https://fonts.googleapis.com', 'unsafe-inline'],

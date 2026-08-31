@@ -1,50 +1,148 @@
 /* Design tokens — colour, type, spacing/radii/elevation/motion, z-index, and the
    --rc-* library contract. Every token referenced by name elsewhere; never
-   duplicate a raw value in feature code. */
+   duplicate a raw value in feature code.
+
+   Naming invariant enforced by ../../../scripts/check-contrast.ts:
+     --c-*   a flat hex colour. Gate-checked. Never a var()/color-mix()/gradient.
+     --cx-*  a *derived* colour (gradient, color-mix, alpha). Invisible to the
+             gate by construction — never let one carry text without a --c-*
+             "floor" companion token registered as a checked pair.
+     --gl-*  glass scalars (opacity/blur/saturation), not colours themselves. */
 
 :root {
-	/* Warm neutral surfaces */
-	--c-bg: #fdfbf7;
+	color-scheme: light;
+
+	/* Cool neutral surfaces — violet-tinted */
+	--c-bg: #f7f5ff;
 	--c-surface: #fff;
-	--c-surface-sunken: #f6f1e9;
-	--c-border: #e7dfd3;
-	--c-border-strong: #d4c8b8;
+	--c-surface-sunken: #eeeaff;
+	--c-border: #d6ccfd;
+	--c-border-strong: #8b74d8;
 
 	/* Text */
-	--c-text: #2a2420;
-	--c-text-muted: #6b5f55;
-	--c-text-subtle: #8f8377;
+	--c-text: #1a1033;
+	--c-text-muted: #4c3f6b;
+	--c-text-subtle: #6f6293; /* never small body text */
 
-	/* Accent — terracotta */
-	--c-accent: #bc4e1c;
-	--c-accent-hover: #a34216;
-	--c-accent-subtle: #fbede4;
-	--c-accent-border: #efcdb6;
+	/* Accent — electric violet */
+	--c-accent: #6d28d9;
+	--c-accent-hover: #5b21b6;
+	--c-accent-subtle: #f3ecff;
+	--c-accent-border: #8a6ae0;
 	--c-on-accent: #fff;
 
-	/* Semantic */
-	--c-success: #2f7a4f;
-	--c-success-subtle: #e6f2ea;
-	--c-error: #a81e2d;
-	--c-error-subtle: #fbe9ea;
-	--c-on-error: #fff;
-	--c-warning: #7a5200;
-	--c-warning-subtle: #fff4dc;
+	/* Ink for the theme-stable vivid ramp (hero gradient, gradient CTAs). Stays
+	   white in BOTH themes — the vivid ramps themselves stay dark in both, so
+	   this must never theme-override the way --c-on-accent does. */
+	--c-on-vivid: #fff;
 
-	/* Focus ring — theme-independent declaration; renders differently per theme */
+	/* Semantic — deliberately distanced from the accent hue */
+	--c-success: #0a6349;
+	--c-success-subtle: #e6fdf5;
+	--c-error: #b3123c;
+	--c-error-subtle: #ffe4ee;
+	--c-on-error: #fff;
+	--c-warning: #8a4b00;
+	--c-warning-subtle: #fff0d6;
+
+	/* Gradient stops — flat hex, so the gate can parse them. Assembled into
+	   --cx-grad-* below. Position in the ramp is 1 (start) → 3 (end). */
+	--c-grad-accent-1: #6d28d9;
+	--c-grad-accent-2: #8f1fc4;
+	--c-grad-accent-3: #b3168f;
+	--c-grad-accent-floor: #b3168f; /* worst rendered pixel vs --c-on-accent */
+	--c-grad-hero-1: #3b1178;
+	--c-grad-hero-2: #7c1fd1;
+	--c-grad-hero-3: #c2185b;
+	--c-grad-hero-floor: #c2185b; /* worst rendered pixel vs --c-on-vivid */
+	--c-grad-surface-1: #fff;
+	--c-grad-surface-2: #f8f4ff;
+	--c-grad-surface-3: #fdf4fb;
+	--c-grad-surface-floor: #f8f4ff; /* worst rendered pixel vs --c-text(-muted) */
+
+	/* Contrast proxies — not design colours. Never reference these in a rule;
+	   they exist only as gate-checkable stand-ins for a surface the gate can't
+	   otherwise see (a blur composite, a shadow-DOM procedural hsl() tile). */
+	--c-glass-floor: #ccc;
+	--c-tile-floor-bg: #d4f7f0;
+	--c-tile-floor-fg: #1b6a5a;
+
+	/* Derived colours — invisible to the contrast gate by design. */
+	--cx-grad-accent: linear-gradient(
+		135deg,
+		var(--c-grad-accent-1) 0%,
+		var(--c-grad-accent-2) 52%,
+		var(--c-grad-accent-3) 100%
+	);
+	--cx-grad-hero: linear-gradient(
+		135deg,
+		var(--c-grad-hero-1) 0%,
+		var(--c-grad-hero-2) 48%,
+		var(--c-grad-hero-3) 100%
+	);
+	--cx-grad-surface: linear-gradient(
+		160deg,
+		var(--c-grad-surface-1) 0%,
+		var(--c-grad-surface-2) 55%,
+		var(--c-grad-surface-3) 100%
+	);
+
+	/* Decorative only — never carries text, so any interpolation space is fine. */
+	--cx-grad-rule: linear-gradient(
+		90deg,
+		transparent 0%,
+		var(--c-grad-accent-2) 30%,
+		var(--c-grad-hero-3) 70%,
+		transparent 100%
+	);
+	--cx-glass: color-mix(in srgb, var(--c-surface) var(--gl-alpha), transparent);
+	--cx-scrim: color-mix(in srgb, var(--c-grad-hero-1) 62%, transparent);
+	--cx-glow-accent: color-mix(in srgb, var(--c-accent) 32%, transparent);
+	--cx-glow-accent-strong: color-mix(in srgb, var(--c-accent) 48%, transparent);
+	--cx-glow-error: color-mix(in srgb, var(--c-error) 30%, transparent);
+
+	/* Glass scalars. 80% is the minimum safe alpha (74% light / 77% dark
+	   computed floor, both themes share one number) — never go lower. */
+	--gl-alpha: 80%;
+	--gl-blur: 18px;
+	--gl-saturate: 1.35;
+
+	/* Focus ring — theme-independent declaration; renders differently per theme.
+	   Inner band separates the ring from the element it wraps; outer band
+	   separates it from the page. Both bands are hard-edged (blur 0). */
 	--focus-ring: 0 0 0 2px var(--c-bg), 0 0 0 4px var(--c-text);
 
-	/* Typography */
+	/* Glow-bearing controls use this instead: identical rings, PLUS a soft glow
+	   appended after them. Appending after two opaque rings keeps the rings
+	   crisp — the glow only shows past the outer edge. The discriminator that
+	   keeps glow from ever being mistaken for a focus indicator: focus rings
+	   always have blur 0 and positive spread; glow always has blur >= 12px and
+	   non-positive spread. Never write a hard-edged shadow in an accent colour
+	   outside of --focus-ring itself. */
+	--focus-ring-glow: 0 0 0 2px var(--c-bg), 0 0 0 4px var(--c-text),
+		0 4px 28px -2px var(--cx-glow-accent-strong), 0 12px 56px -12px var(--cx-glow-accent);
+
+	/* Typography — oversized + expressive */
 	--font-display: 'Fraunces', georgia, 'Times New Roman', serif;
 	--font-text: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-	--fs-display: clamp(2rem, 4vw, 2.75rem);
-	--fs-h1: clamp(1.75rem, 3vw, 2.25rem);
-	--fs-h2: 1.5rem;
+	--fs-hero: clamp(2.75rem, 9vw, 6rem);
+	--fs-display: clamp(2.25rem, 5vw, 3.5rem);
+	--fs-h1: clamp(1.875rem, 3.5vw, 2.5rem);
+	--fs-h2: 1.625rem;
 	--fs-h3: 1.25rem;
 	--fs-body-lg: 1.0625rem;
 	--fs-body: 1rem;
 	--fs-sm: 0.875rem;
 	--fs-xs: 0.75rem;
+	--ls-hero: -0.045em;
+	--ls-tight: -0.025em;
+	--ls-wide: 0.08em;
+	--lh-hero: 0.92;
+	--lh-tight: 1.1;
+	--lh-body: 1.6;
+	--fw-regular: 400;
+	--fw-medium: 500;
+	--fw-bold: 700;
 
 	/* Spacing — 4px base */
 	--s-1: 0.25rem;
@@ -55,17 +153,28 @@
 	--s-6: 2rem;
 	--s-7: 3rem;
 	--s-8: 4rem;
+	--s-9: 6rem;
 
-	/* Radii */
-	--r-sm: 6px;
-	--r-md: 10px;
-	--r-lg: 14px;
+	/* Radii — softer, more modern */
+	--r-xs: 4px;
+	--r-sm: 8px;
+	--r-md: 12px;
+	--r-lg: 18px;
+	--r-xl: 24px;
+	--r-2xl: 32px;
 	--r-full: 999px;
 
-	/* Elevation */
-	--sh-1: 0 1px 2px rgb(42 36 32 / 6%), 0 1px 3px rgb(42 36 32 / 4%);
-	--sh-2: 0 2px 8px rgb(42 36 32 / 8%);
-	--sh-3: 0 8px 24px rgb(42 36 32 / 12%);
+	/* Elevation — four steps, cool-tinted */
+	--sh-1: 0 1px 2px rgb(26 16 51 / 6%), 0 1px 3px rgb(26 16 51 / 5%);
+	--sh-2: 0 2px 6px rgb(26 16 51 / 7%), 0 8px 20px -6px rgb(26 16 51 / 11%);
+	--sh-3: 0 4px 12px rgb(26 16 51 / 9%), 0 20px 48px -12px rgb(26 16 51 / 20%);
+	--sh-4: 0 8px 24px rgb(26 16 51 / 12%), 0 32px 72px -16px rgb(26 16 51 / 28%);
+
+	/* Glow — blur always >= 12px, spread always <= 0. Reinforces a state; is
+	   never a state's only cue. */
+	--sh-glow-accent: 0 2px 18px -2px var(--cx-glow-accent), 0 8px 40px -12px var(--cx-glow-accent);
+	--sh-glow-accent-lg: 0 4px 28px -2px var(--cx-glow-accent-strong), 0 12px 56px -12px var(--cx-glow-accent);
+	--sh-glow-error: 0 2px 18px -2px var(--cx-glow-error);
 
 	/* Motion */
 	--dur-micro: 120ms;
@@ -92,6 +201,7 @@
 	--rc-accent-subtle: var(--c-accent-subtle);
 	--rc-accent-border: var(--c-accent-border);
 	--rc-on-accent: var(--c-on-accent);
+	--rc-on-vivid: var(--c-on-vivid);
 	--rc-font-display: var(--font-display);
 	--rc-font-text: var(--font-text);
 	--rc-fs-h3: var(--fs-h3);
@@ -106,9 +216,12 @@
 	--rc-s-6: var(--s-6);
 	--rc-radius: var(--r-lg);
 	--rc-radius-sm: var(--r-sm);
+	--rc-radius-lg: var(--r-xl);
 	--rc-radius-full: var(--r-full);
 	--rc-shadow: var(--sh-1);
 	--rc-shadow-hover: var(--sh-2);
+	--rc-shadow-lg: var(--sh-3);
+	--rc-shadow-xl: var(--sh-4);
 	--rc-focus-ring: var(--focus-ring);
 	--rc-duration: var(--dur-base);
 	--rc-ease: var(--ease);
@@ -117,41 +230,157 @@
 	   library with its own dark-mode media query — which meant it followed
 	   the OS instead of this app's theme. Now it reads its saturation and
 	   lightness from here like every other themed surface; only the hue
-	   itself is procedural (derived from the recipe name). Values below
-	   match what the library used to hardcode, so this is a like-for-like
-	   handoff, not a look change. */
-	--rc-tile-bg-s: 42%;
-	--rc-tile-bg-l: 88%;
-	--rc-tile-fg-s: 45%;
-	--rc-tile-fg-l: 28%;
+	   itself is procedural (derived from the recipe name). */
+	--rc-tile-bg-s: 70%;
+	--rc-tile-bg-l: 90%;
+	--rc-tile-fg-s: 60%;
+	--rc-tile-fg-l: 26%;
+
+	/* Vivid surfaces for a future library visual pass — inert today, since no
+	   published component reads them yet. Defining the mapping now means that
+	   pass is a pure library change: no app-side token work left to do. */
+	--rc-grad-accent: var(--cx-grad-accent);
+	--rc-grad-surface: var(--cx-grad-surface);
+	--rc-glow-accent: var(--sh-glow-accent);
+	--rc-glass: var(--cx-glass);
+	--rc-glass-blur: var(--gl-blur);
 }
 
+/* ============================================================================
+   DARK PALETTE — written twice, on purpose.
+     block A: system dark, unless the user explicitly chose light
+     block B: explicit dark, regardless of system
+   A selector list cannot straddle a media query, and routing values through
+   var() indirection would make them unreadable to the contrast gate — turning
+   the gate into a lie. So the duplication is deliberate, and check-contrast.ts
+   asserts the two blocks declare identical values: edit both, or the build
+   fails.
+
+   Specificity: :root:not([data-theme='light']) and :root[data-theme='dark']
+   are both (0,2,0), so source order decides — block B must stay after block A.
+   ========================================================================== */
+
 @media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+
+		--c-bg: #0b0616;
+		--c-surface: #150d29;
+		--c-surface-sunken: #070310;
+		--c-border: #33245a;
+		--c-border-strong: #7a5fbd;
+		--c-text: #f4f0ff;
+		--c-text-muted: #bdb2e0;
+		--c-text-subtle: #9b8fc8;
+		--c-accent: #b794ff;
+		--c-accent-hover: #cbb2ff;
+		--c-accent-subtle: #241546;
+		--c-accent-border: #8a6fd0;
+		--c-on-accent: #17082e;
+		--c-success: #4fd6a8;
+		--c-success-subtle: #06251c;
+		--c-error: #ff8fa8;
+		--c-error-subtle: #2b0b16;
+		--c-on-error: #2b0b16;
+		--c-warning: #f0bd66;
+		--c-warning-subtle: #2a1c06;
+		--c-grad-accent-1: #b794ff;
+		--c-grad-accent-2: #d68cf0;
+		--c-grad-accent-3: #ff8fc0;
+		--c-grad-accent-floor: #b993fe; /* an interpolated pixel, not a stop — the sampler proves this */
+		--c-grad-hero-1: #2a0b5c;
+		--c-grad-hero-2: #6318b0;
+		--c-grad-hero-3: #a01048;
+		--c-grad-hero-floor: #a01048;
+		--c-grad-surface-1: #1a1030;
+		--c-grad-surface-2: #150d29;
+		--c-grad-surface-3: #1f0f2c;
+		--c-grad-surface-floor: #1f0f2c;
+		--c-glass-floor: #443d54;
+		--c-tile-floor-bg: #1c4a41;
+		--c-tile-floor-fg: #b0e8dd;
+		--cx-glow-accent: color-mix(in srgb, var(--c-accent) 45%, transparent);
+		--cx-glow-accent-strong: color-mix(in srgb, var(--c-accent) 62%, transparent);
+		--cx-glow-error: color-mix(in srgb, var(--c-error) 42%, transparent);
+		--cx-scrim: color-mix(in srgb, #000 72%, transparent);
+		--sh-1: 0 1px 2px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 4%);
+		--sh-2: 0 2px 8px rgb(0 0 0 / 50%), inset 0 1px 0 rgb(255 255 255 / 6%);
+		--sh-3: 0 8px 28px rgb(0 0 0 / 60%), inset 0 1px 0 rgb(255 255 255 / 7%);
+		--sh-4: 0 16px 48px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 9%);
+		--rc-tile-bg-s: 45%;
+		--rc-tile-bg-l: 20%;
+		--rc-tile-fg-s: 55%;
+		--rc-tile-fg-l: 80%;
+	}
+}
+
+:root[data-theme='dark'] {
+	/* Identical to the block above — enforced by check-contrast.ts. */
+	color-scheme: dark;
+
+	--c-bg: #0b0616;
+	--c-surface: #150d29;
+	--c-surface-sunken: #070310;
+	--c-border: #33245a;
+	--c-border-strong: #7a5fbd;
+	--c-text: #f4f0ff;
+	--c-text-muted: #bdb2e0;
+	--c-text-subtle: #9b8fc8;
+	--c-accent: #b794ff;
+	--c-accent-hover: #cbb2ff;
+	--c-accent-subtle: #241546;
+	--c-accent-border: #8a6fd0;
+	--c-on-accent: #17082e;
+	--c-success: #4fd6a8;
+	--c-success-subtle: #06251c;
+	--c-error: #ff8fa8;
+	--c-error-subtle: #2b0b16;
+	--c-on-error: #2b0b16;
+	--c-warning: #f0bd66;
+	--c-warning-subtle: #2a1c06;
+	--c-grad-accent-1: #b794ff;
+	--c-grad-accent-2: #d68cf0;
+	--c-grad-accent-3: #ff8fc0;
+	--c-grad-accent-floor: #b993fe;
+	--c-grad-hero-1: #2a0b5c;
+	--c-grad-hero-2: #6318b0;
+	--c-grad-hero-3: #a01048;
+	--c-grad-hero-floor: #a01048;
+	--c-grad-surface-1: #1a1030;
+	--c-grad-surface-2: #150d29;
+	--c-grad-surface-3: #1f0f2c;
+	--c-grad-surface-floor: #1f0f2c;
+	--c-glass-floor: #443d54;
+	--c-tile-floor-bg: #1c4a41;
+	--c-tile-floor-fg: #b0e8dd;
+	--cx-glow-accent: color-mix(in srgb, var(--c-accent) 45%, transparent);
+	--cx-glow-accent-strong: color-mix(in srgb, var(--c-accent) 62%, transparent);
+	--cx-glow-error: color-mix(in srgb, var(--c-error) 42%, transparent);
+	--cx-scrim: color-mix(in srgb, #000 72%, transparent);
+	--sh-1: 0 1px 2px rgb(0 0 0 / 40%), inset 0 1px 0 rgb(255 255 255 / 4%);
+	--sh-2: 0 2px 8px rgb(0 0 0 / 50%), inset 0 1px 0 rgb(255 255 255 / 6%);
+	--sh-3: 0 8px 28px rgb(0 0 0 / 60%), inset 0 1px 0 rgb(255 255 255 / 7%);
+	--sh-4: 0 16px 48px rgb(0 0 0 / 70%), inset 0 1px 0 rgb(255 255 255 / 9%);
+	--rc-tile-bg-s: 45%;
+	--rc-tile-bg-l: 20%;
+	--rc-tile-fg-s: 55%;
+	--rc-tile-fg-l: 80%;
+}
+
+/* Glass degrades to fully opaque wherever the browser can't (or the user asked
+   it not to) do a backdrop blur. Raising alpha to 100% strictly dominates the
+   floor maths in the design spec, so this can never make text harder to read. */
+@supports not (backdrop-filter: blur(1px)) {
 	:root {
-		--c-bg: #17130f;
-		--c-surface: #1f1a16;
-		--c-surface-sunken: #14100d;
-		--c-border: #332b24;
-		--c-border-strong: #4a3f35;
-		--c-text: #f5efe7;
-		--c-text-muted: #b8aa9c;
-		--c-text-subtle: #8f8377;
-		--c-accent: #e8763c;
-		--c-accent-hover: #f08a54;
-		--c-accent-subtle: #2e1d13;
-		--c-accent-border: #4a2e1d;
-		--c-on-accent: #1a1008;
-		--c-success: #5fb784;
-		--c-success-subtle: #16281e;
-		--c-error: #f2848c;
-		--c-error-subtle: #2c1517;
-		--c-on-error: #2c1517;
-		--c-warning: #e0b15c;
-		--c-warning-subtle: #2a2010;
-		--rc-tile-bg-s: 30%;
-		--rc-tile-bg-l: 22%;
-		--rc-tile-fg-s: 35%;
-		--rc-tile-fg-l: 82%;
+		--gl-alpha: 100%;
+		--gl-blur: 0px;
+	}
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	:root {
+		--gl-alpha: 100%;
+		--gl-blur: 0px;
 	}
 }
 
@@ -162,5 +391,12 @@
 		animation-duration: 0.01ms !important;
 		animation-iteration-count: 1 !important;
 		transition-duration: 0.01ms !important;
+	}
+
+	/* prefers-reduced-motion cannot cross a shadow boundary on its own, but
+	   custom properties DO inherit into shadow DOM — so this one line is what
+	   makes every library component's own transition/animation respect it too. */
+	:root {
+		--rc-duration: 0.01ms;
 	}
 }

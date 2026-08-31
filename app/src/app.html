@@ -4,6 +4,21 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<script nonce="%sveltekit.nonce%">
+			// Blocking, before first paint: mirror a stored theme choice onto <html>
+			// so SSR markup never paints with the wrong palette and then flips once
+			// hydration runs. Absent/corrupt storage falls through silently — no
+			// attribute set means tokens.css's prefers-color-scheme block decides,
+			// which is exactly today's system-only behaviour.
+			try {
+				var stored = JSON.parse(localStorage.getItem('rfmp:theme')).data.mode;
+				if (stored === 'light' || stored === 'dark' || stored === 'system') {
+					document.documentElement.dataset.theme = stored;
+				}
+			} catch (e) {
+				/* no choice stored yet, or storage is blocked — system preference decides */
+			}
+		</script>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 		<link
