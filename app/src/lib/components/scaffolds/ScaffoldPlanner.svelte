@@ -44,6 +44,7 @@
 	@media (width >= 1024px) {
 		.week {
 			display: grid;
+
 			/* minmax(0, 1fr), not a bare 1fr: a grid item's default minimum
 			   width is its content's min-content size, and <planner-day> is a
 			   host element the app can't add its own min-width: 0 inside of.
@@ -55,6 +56,7 @@
 			   instead of ever becoming reachable. */
 			grid-template-columns: repeat(7, minmax(0, 1fr));
 			gap: var(--s-4);
+
 			/* Belt-and-suspenders for any width this small a minmax(0, 1fr)
 			   can't rescue on its own: scrolls inside its own container
 			   rather than clipping or pushing the page itself wider. */
