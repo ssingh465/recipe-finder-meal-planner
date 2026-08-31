@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import ScaffoldPlanner from '$lib/components/scaffolds/ScaffoldPlanner.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { DAYS, DAY_LABELS, type DayOfWeek } from '$lib/domain/day';
 	import { resolveRecipeIds, type ResolvedRecipe } from '$lib/services/recipeResolver';
@@ -45,9 +46,9 @@
 	//
 	// $derived, not a plain function called from the template: entries must be
 	// the SAME array reference across a re-render unrelated to plan/resolvedCache
-	// (e.g. toggling movingEntry for the move bar), or Stencil sees a new prop
-	// value and tears down and rebuilds every <li>, taking focus with it — which
-	// broke the Move button's focus-return-on-dismiss.
+	// (e.g. switching the selected day), or Stencil sees a new prop value and
+	// tears down and rebuilds every <li>, taking focus with it — which broke
+	// the Move button's focus-return-on-dismiss.
 	const entriesByDay = $derived.by(() => {
 		const byDay = {} as Record<DayOfWeek, PlannerEntry[]>;
 		for (const day of DAYS) {
@@ -77,14 +78,35 @@
 
 	const weekIsEmpty = $derived(DAYS.every((day) => plan.day(day).length === 0));
 
-	// A day's default follows its population (empty -> collapsed, so a mostly
-	// empty week doesn't demand seven screens of scrolling) until the user
-	// overrides it directly — after that their choice sticks regardless of
-	// what gets added or removed.
-	let collapsedOverride = $state<Partial<Record<DayOfWeek, boolean>>>({});
-	function isCollapsed(day: DayOfWeek): boolean {
-		return collapsedOverride[day] ?? plan.day(day).length === 0;
+	// The browser's own local clock, mapped onto our Monday-first DayOfWeek —
+	// Date#getDay() is Sunday-first (0-6), so `sun` needs to land at the end
+	// rather than the start. Purely a display default: nothing about "today"
+	// is stored or fed back into the plan itself.
+	function todayAsDayOfWeek(): DayOfWeek {
+		const jsDay = new Date().getDay();
+		return DAYS[(jsDay + 6) % 7];
 	}
+
+	// null (rather than computing today() eagerly here) so the server-rendered
+	// HTML and the client's first render agree before hydration — computing
+	// via the browser's clock at component-init would run during SSR too,
+	// and a server/client date mismatch right at a day boundary would show
+	// one day as "today" in the markup and another once hydrated. This
+	// $effect only ever runs client-side, once (todayAsDayOfWeek() reads no
+	// reactive state, so nothing re-triggers it), and both change together.
+	let todayKey = $state<DayOfWeek | null>(null);
+
+	// Exactly one day's planner is ever visible. Defaults to Monday until the
+	// effect below resolves the real "today" client-side, then switches —
+	// mirroring the same hydrated-flag pattern every store on this page
+	// already uses. Picking any row in the list moves it after that.
+	let activeDay = $state<DayOfWeek>('mon');
+
+	$effect(() => {
+		const today = todayAsDayOfWeek();
+		todayKey = today;
+		activeDay = today;
+	});
 
 	function nameFor(recipeId: string): string {
 		return resolvedCache[recipeId]?.recipe?.name ?? 'this recipe';
@@ -158,6 +180,21 @@
 			addToast(`Moved ${name} to ${DAY_LABELS[day]}.`);
 		}
 	}
+
+	// Roving tabindex + arrow-key navigation, the standard keyboard pattern
+	// for a tablist — Up/Down here since the list is vertical, not Left/Right.
+	let dayTabs: HTMLButtonElement[] = $state([]);
+	function selectDay(day: DayOfWeek) {
+		activeDay = day;
+	}
+	function handleTabKeydown(event: KeyboardEvent, index: number) {
+		if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+		event.preventDefault();
+		const delta = event.key === 'ArrowDown' ? 1 : -1;
+		const next = (index + delta + DAYS.length) % DAYS.length;
+		selectDay(DAYS[next]);
+		dayTabs[next]?.focus();
+	}
 </script>
 
 <svelte:head>
@@ -174,22 +211,46 @@
 		{/if}
 	{/snippet}
 
-	{#snippet days()}
-		{#if !plan.hydrated}
-			{#each DAYS as day (day)}
+	{#snippet dayList()}
+		<div class="day-tablist" role="tablist" aria-orientation="vertical" aria-label="Days of the week">
+			{#each DAYS as day, index (day)}
+				<button
+					bind:this={dayTabs[index]}
+					type="button"
+					role="tab"
+					id={`day-tab-${day}`}
+					aria-selected={activeDay === day}
+					aria-controls="day-tabpanel"
+					tabindex={activeDay === day ? 0 : -1}
+					class="day-tab"
+					class:active={activeDay === day}
+					onclick={() => selectDay(day)}
+					onkeydown={(event) => handleTabKeydown(event, index)}
+				>
+					<span class="day-tab-name">
+						{DAY_LABELS[day]}
+						{#if day === todayKey}<Badge>Today</Badge>{/if}
+					</span>
+					<span class="day-tab-count">{entriesByDay[day].length}</span>
+				</button>
+			{/each}
+		</div>
+	{/snippet}
+
+	{#snippet selectedDay()}
+		<div id="day-tabpanel" role="tabpanel" aria-labelledby={`day-tab-${activeDay}`}>
+			{#if !plan.hydrated}
 				<div class="day-skeleton" aria-hidden="true">
 					<div class="skeleton-line title"></div>
 					<div class="skeleton-line"></div>
 					<div class="skeleton-line"></div>
 				</div>
-			{/each}
-		{:else}
-			{#each DAYS as day (day)}
+			{:else}
 				<planner-day
-					{day}
-					dayLabel={DAY_LABELS[day]}
-					entries={entriesByDay[day]}
-					collapsed={isCollapsed(day)}
+					day={activeDay}
+					dayLabel={DAY_LABELS[activeDay]}
+					entries={entriesByDay[activeDay]}
+					collapsed={false}
 					onentryremove={(event: PlannerDayCustomEvent<{ recipeId: string; day: DayOfWeek }>) =>
 						handleEntryRemove(event.detail.recipeId, event.detail.day)}
 					onentrymoverequest={(
@@ -200,15 +261,13 @@
 							event.detail.fromDay,
 							event.currentTarget as HTMLElement
 						)}
-					ondaytoggle={(event: PlannerDayCustomEvent<{ day: DayOfWeek; collapsed: boolean }>) =>
-						(collapsedOverride = { ...collapsedOverride, [event.detail.day]: event.detail.collapsed })}
 					onrecipeselect={(event: PlannerDayCustomEvent<{ recipeId: string }>) =>
 						goto(`/recipes/${event.detail.recipeId}`)}
 				>
 					<p slot="empty">No meals planned</p>
 				</planner-day>
-			{/each}
-		{/if}
+			{/if}
+		</div>
 	{/snippet}
 </ScaffoldPlanner>
 
@@ -228,6 +287,45 @@
 {/if}
 
 <style>
+	.day-tablist {
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-1);
+	}
+
+	.day-tab {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--s-2);
+		min-height: 44px;
+		padding-inline: var(--s-3);
+		background: transparent;
+		border: 1px solid var(--c-border);
+		border-radius: var(--r-md);
+		color: var(--c-text);
+		font-family: var(--font-text);
+		font-size: var(--fs-body);
+		cursor: pointer;
+	}
+
+	.day-tab.active {
+		background: var(--c-accent-subtle);
+		border-color: var(--c-accent-border);
+		font-weight: 700;
+	}
+
+	.day-tab-name {
+		display: flex;
+		align-items: center;
+		gap: var(--s-2);
+	}
+
+	.day-tab-count {
+		color: var(--c-text-muted);
+		font-size: var(--fs-sm);
+	}
+
 	.day-skeleton {
 		display: flex;
 		flex-direction: column;
