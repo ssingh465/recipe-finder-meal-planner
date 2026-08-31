@@ -4,10 +4,13 @@
 	interface Props {
 		title: string;
 		emptyState?: Snippet;
-		days: Snippet;
+		/** The vertical list of day rows — always a list, at every width. */
+		dayList: Snippet;
+		/** The single currently-selected day's content. */
+		selectedDay: Snippet;
 	}
 
-	let { title, emptyState, days }: Props = $props();
+	let { title, emptyState, dayList, selectedDay }: Props = $props();
 </script>
 
 <div class="page">
@@ -17,8 +20,14 @@
 		<div class="empty-state">{@render emptyState()}</div>
 	{/if}
 
-	<div class="week">
-		{@render days()}
+	<div class="layout">
+		<div class="day-nav">
+			{@render dayList()}
+		</div>
+
+		<div class="day-panel">
+			{@render selectedDay()}
+		</div>
 	</div>
 </div>
 
@@ -33,34 +42,38 @@
 		font-size: var(--fs-h1);
 	}
 
-	/* Same DOM at every width — grid on desktop, stacked flex below 1024px.
-	   Each child is one <planner-day>, always seven of them. */
-	.week {
+	/* The day list is a vertical list of rows at every width — what changes is
+	   only whether it sits above the selected day's content (narrow) or
+	   beside it as a persistent column (wide). Never a grid of all seven
+	   panels at once — exactly one day's content renders at a time. */
+	.layout {
 		display: flex;
 		flex-direction: column;
 		gap: var(--s-4);
 	}
 
-	@media (width >= 1024px) {
-		.week {
-			display: grid;
+	.day-nav {
+		display: flex;
+		flex-direction: column;
+		gap: var(--s-2);
+	}
 
-			/* minmax(0, 1fr), not a bare 1fr: a grid item's default minimum
-			   width is its content's min-content size, and <planner-day> is a
-			   host element the app can't add its own min-width: 0 inside of.
-			   Without this, a day name that can't wrap (or any other
-			   unshrinkable shadow-DOM content) forces its track wider than a
-			   plain 1fr share — seven of those can add up to more than the
-			   container's width, and since html/body block horizontal
-			   scroll, the overflow was silently clipping the last day(s)
-			   instead of ever becoming reachable. */
-			grid-template-columns: repeat(7, minmax(0, 1fr));
-			gap: var(--s-4);
+	.day-panel {
+		min-width: 0;
+	}
 
-			/* Belt-and-suspenders for any width this small a minmax(0, 1fr)
-			   can't rescue on its own: scrolls inside its own container
-			   rather than clipping or pushing the page itself wider. */
-			overflow-x: auto;
+	@media (width >= 768px) {
+		.layout {
+			flex-direction: row;
+			align-items: flex-start;
+		}
+
+		.day-nav {
+			flex: 0 0 14rem;
+		}
+
+		.day-panel {
+			flex: 1;
 		}
 	}
 </style>
